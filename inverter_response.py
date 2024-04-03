@@ -19,12 +19,12 @@ class InverterResponseConverter(object):
         outputApparentPower = int(response1[23:27])
         outputActivePower = int(response1[28:32])
         
-        inputCurrent1 = int(response1[60:64])
-        inputVoltage1 = int(response1[65:70])        
+        inputCurrent1 = float(response1[60:64])
+        inputVoltage1 = float(response1[65:70])        
         inputPower1 = int(response1[98:103])        
 
-        inputCurrent2 = int(response2[1:5])
-        inputVoltage2 = int(response2[6:11])
+        inputCurrent2 = float(response2[1:5])
+        inputVoltage2 = float(response2[6:11])
         inputPower2 = int(response2[12:17])
 
         inputCurrent = round((inputCurrent1 + inputCurrent2) / 2, 2)
