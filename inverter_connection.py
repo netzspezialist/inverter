@@ -14,17 +14,18 @@ class InverterConnection:
         self.connected = False
         self.lock = threading.Lock()
 
+        self.connectionType = inverterConfig["connectionType"]        
         self.port = inverterConfig["port"]
-        self.connectionType = inverterConfig["connectionType"]
-
+    
         if not os.path.exists(self.port):
             raise FileNotFoundError('Port not found')
 
     def open(self):
         try:
             if self.connectionType == 'serial':
+                self.logger.info('Opening inverter connection serial port')    
                 self.ser = serial.Serial()
-                self.ser.port = inverterConfig.port                
+                self.ser.port = self.port                
                 self.ser.baudrate = 2400
                 self.ser.bytesize = serial.EIGHTBITS     #number of bits per bytes
                 self.ser.parity = serial.PARITY_NONE     #set parity check: no parity
@@ -37,7 +38,8 @@ class InverterConnection:
 
                 self.ser.open()
             else:
-                self.port = os.open(self.port, os.O_RDWR | os.O_NONBLOCK)
+                self.logger.info('Opening inverter connection USB port')    
+                self.usb.port = os.open(self.usb.port, os.O_RDWR | os.O_NONBLOCK)
 
             self.connected = True
             self.logger.info('Inverter connection opened')
@@ -108,7 +110,7 @@ class InverterConnection:
                 if self.connectionType == 'serial':
                     r = self.ser.read(256)
                 else:
-                    r = os.read(self.port, 256)
+                    r = os.read(self.usb.port, 256)
                 responseBytes += r
                 if  b'\r' in responseBytes:
                     lastResponse = True
