@@ -5,7 +5,7 @@ import time
 import crcmod
 import serial
 
-from inverter_config import inverter as invertConfig
+from inverter_config import inverter as inverterConfig
 
 class InverterConnection:
     def __init__(self, logger=None):
@@ -14,14 +14,17 @@ class InverterConnection:
         self.connected = False
         self.lock = threading.Lock()
 
-        if not os.path.exists(invertConfig.port):
+        self.port = inverterConfig["port"]
+        self.connectionType = inverterConfig["connectionType"]
+
+        if not os.path.exists(self.port):
             raise FileNotFoundError('Port not found')
 
     def open(self):
         try:
-            if invertConfig.connectionType == 'serial':
+            if self.connectionType == 'serial':
                 self.ser = serial.Serial()
-                self.ser.port = invertConfig.port                
+                self.ser.port = inverterConfig.port                
                 self.ser.baudrate = 2400
                 self.ser.bytesize = serial.EIGHTBITS     #number of bits per bytes
                 self.ser.parity = serial.PARITY_NONE     #set parity check: no parity
@@ -34,7 +37,7 @@ class InverterConnection:
 
                 self.ser.open()
             else:
-                self.port = os.open('/dev/hidraw0', os.O_RDWR | os.O_NONBLOCK)
+                self.port = os.open(self.port, os.O_RDWR | os.O_NONBLOCK)
 
             self.connected = True
             self.logger.info('Inverter connection opened')
@@ -43,7 +46,7 @@ class InverterConnection:
 
 
     def close(self):
-        if invertConfig.connectionType == 'serial':
+        if self.connectionType == 'serial':
             self.ser.close()
         else:
             os.close(self.port)
@@ -85,7 +88,7 @@ class InverterConnection:
         
         response = ""
         try:
-            if invertConfig.connectionType == 'serial':
+            if self.connectionType == 'serial':
                 time.sleep (0.05)
                 self.ser.write(command_crc)
             else:
@@ -102,7 +105,7 @@ class InverterConnection:
             lastResponse = False
             while lastResponse == False:
                 time.sleep (0.05)
-                if invertConfig.connectionType == 'serial':
+                if self.connectionType == 'serial':
                     r = self.ser.read(256)
                 else:
                     r = os.read(self.port, 256)
