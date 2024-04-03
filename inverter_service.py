@@ -52,7 +52,7 @@ if __name__ == '__main__':
     logger = logging.getLogger(__name__)
     logger.setLevel(logging.INFO)
 
-    logPath = f'{os.getcwd()}/log'
+    logPath = f'{os.getcwd()}log'
     if not os.path.exists(logPath):
         os.makedirs(logPath)
 
