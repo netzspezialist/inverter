@@ -4,9 +4,9 @@ import os
 import signal
 import sys
 from threading import Thread
+from os.path import dirname, abspath
 from inverter_connection import InverterConnection
 from inverter_monitor import InverterMonitor
-
 from inverter_commands import InverterCommands
 from inverter_webapi import InverterWebAPI
 
@@ -52,7 +52,10 @@ if __name__ == '__main__':
     logger = logging.getLogger(__name__)
     logger.setLevel(logging.INFO)
 
-    logPath = f'{os.getcwd()}log'
+
+    script_path = abspath(dirname(__file__))
+
+    logPath = f'{script_path}/log'
     if not os.path.exists(logPath):
         os.makedirs(logPath)
 
