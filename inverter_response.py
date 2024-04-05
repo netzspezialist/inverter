@@ -29,7 +29,7 @@ class InverterResponseConverter(object):
 
         inputCurrent = round((inputCurrent1 + inputCurrent2) / 2, 2)
         inputVoltage = round((inputVoltage1 + inputVoltage2) / 2, 2)
-        inputPower = round((inputPower1 + inputPower2) / 2, 2)
+        inputPower = round((inputPower1 + inputPower2), 2)
 
 
 
