@@ -51,7 +51,7 @@ class InverterWebAPI(Flask):
         dataOutput = self.inverterCommands.qlt()
         data = { 
             "command": "energy", 
-            "timestamp": datetime.now().isoformat()[:-3], 
+            "timestamp": dataInput["timestamp"].isoformat()[:-3], 
             "totalInput": dataInput["totalGenerated"],
             "totalOutput": dataOutput["totalOutput"]
         }        
