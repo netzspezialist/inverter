@@ -71,7 +71,7 @@ class InverterCommands:
         command = "QLT"
         timestamp = InverterResponseConverter.createTimeStamp(startTime, stopTime)
 
-        data = InverterResponseConverter.qet(command, timestamp, response)
+        data = InverterResponseConverter.qlt(command, timestamp, response)
 
         self.logger.debug(f'energy data: {data}')
 
