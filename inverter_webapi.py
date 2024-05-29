@@ -56,7 +56,6 @@ class InverterWebAPI(Flask):
             "totalOutput": dataOutput["totalOutput"]
         }        
         self.logger.info(f'Inverter data: {data}')
-        data["timestamp"] = data["timestamp"].isoformat()[:-3]
         return jsonify(data)
 
     
