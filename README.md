@@ -12,6 +12,7 @@ Inverters USB do not support all commands (QPIGS2).
 ```
 sudo apt install python3-pip
 sudo apt install mosquitto
+sudo apt install sqlite3
 pip3 install influxdb-client
 pip3 install paho-mqtt
 pip3 install flask

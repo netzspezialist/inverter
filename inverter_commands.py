@@ -45,8 +45,8 @@ class InverterCommands:
 
         return data
     
-    def energy(self):
-        self.logger.debug('Getting energy...')
+    def qet(self):
+        self.logger.debug('Getting total input...')
         startTime = datetime.now()        
         response = self.inverterConnection.execute("QET")
         stopTime = datetime.now()
@@ -60,6 +60,22 @@ class InverterCommands:
         self.logger.debug(f'energy data: {data}')
 
         return data
+    
+    def qlt(self):
+        self.logger.debug('Getting total output...')
+        startTime = datetime.now()        
+        response = self.inverterConnection.execute("QLT")
+        stopTime = datetime.now()
+        self.logger.info(f'energy result: {response}')
+
+        command = "QLT"
+        timestamp = InverterResponseConverter.createTimeStamp(startTime, stopTime)
+
+        data = InverterResponseConverter.qet(command, timestamp, response)
+
+        self.logger.debug(f'energy data: {data}')
+
+        return data    
     
     def updateSetting(self, setting, value):
         self.logger.info(f'Updating inverter setting [{setting}] with value [{value}]')

@@ -14,6 +14,11 @@ mqtt = {
     "username": "user",
     "password": "password"
 }
+inverterBatteryManager = {
+    "enabled": True,
+    "topic": "bms-commands",
+    "defaultVoltage": "54.6"
+}
 inverter = {
     "connectionType": "serial",  # serial or usb
     "port": "/dev/ttyUSB0" # serial port /dev/ttyUSB0" or usb device /dev/hidraw0

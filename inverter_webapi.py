@@ -46,8 +46,15 @@ class InverterWebAPI(Flask):
         return jsonify(responseData)
     
     def get_inverter_energy(self):
-        self.logger.info('get inverter qpigs ...')
-        data = self.inverterCommands.energy()
+        self.logger.info('get inverter energy ...')
+        dataInput = self.inverterCommands.qet()
+        dataOutput = self.inverterCommands.qlt()
+        data = { 
+            "command": "energy", 
+            "timestamp": datetime.now().isoformat()[:-3], 
+            "totalInput": dataInput["totalGenerated"],
+            "totalOutput": dataOutput["totalOutput"]
+        }
         self.logger.info(f'Inverter data: {data}')
         data["timestamp"] = data["timestamp"].isoformat()[:-3]
         return jsonify(data)

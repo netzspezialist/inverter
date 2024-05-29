@@ -62,9 +62,8 @@ class InverterConnection:
         
         self.logger.debug(f'Inverter execute command {[command]}')
 
-        self.lock.acquire()
-        response = self.send_command(command)
-        self.lock.release()
+        with self.lock:
+            response = self.send_command(command)
 
         if response is None:
             raise ConnectionError('No response from inverter')

@@ -87,6 +87,19 @@ class InverterResponseConverter(object):
             "totalGenerated": totalGenerated + " kWh"
         }
         return data
+    
+    @staticmethod
+    def qlt(command, timestamp, response):
+
+        totalGenerated = int(response[2:10])        
+        totalGenerated = str(totalGenerated / 1000)
+        
+        data = { 
+            "command": command, 
+            "timestamp": timestamp, 
+            "totalOutput": totalGenerated + " kWh"
+        }
+        return data    
 
     @staticmethod
     def updateSetting(command, timestamp, response):
