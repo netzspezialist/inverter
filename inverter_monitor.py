@@ -40,7 +40,7 @@ class InverterMonitor:
                 self.logger.debug('Inverter monitor loop running ...')
 
                 # Reset bulk and float voltage to standard values at 20:00
-                now = datetime.datetime.now()
+                now = datetime.now()
                 specific_time = now.replace(hour=20, minute=0, second=0, microsecond=0)
 
                 # Check if current date is different from last execution date
