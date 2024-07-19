@@ -12,6 +12,7 @@ class InverterMonitor:
         self.influx = InverterInflux(logger)
         self.inverterCommands = inverterCommands
         self.mqtt = InverterMqtt(logger)
+        self.last_execution_date = None  # Initialize last execution date
 
     def start(self):
         self.logger.info('Starting inverter monitoring ...')
@@ -37,6 +38,24 @@ class InverterMonitor:
         while self.serviceRunning:  
             try:
                 self.logger.debug('Inverter monitor loop running ...')
+
+                # Reset bulk and float voltage to standard values at 20:00
+                now = datetime.datetime.now()
+                specific_time = now.replace(hour=20, minute=0, second=0, microsecond=0)
+
+                # Check if current date is different from last execution date
+                if self.last_execution_date != now.date():
+                    # If current time is close to the specific time (within 600 seconds here)
+                    if abs((now - specific_time).total_seconds()) < 600:
+                        self.logger.info("Resetting inverter settings to standard values")
+                        response_string = self.inverterCommands.updateSetting("batteryFloatVoltage", "54.6")
+                        if "ACK" in response_string:                            
+                            response_string = self.inverterCommands.updateSetting("batteryBulkVoltage", "54.6")
+                            if "ACK" in response_string:
+                                self.logger.info("Inverter settings updated successfully")
+                                # Update last execution date to today
+                                self.last_execution_date = now.date()
+                                            
                 data = self.inverterCommands.qpigs()
                 self.influx.upload_qpigs(data["timestamp"], data)
                 self.logger.debug(f'Inverter data: {data}')

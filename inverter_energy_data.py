@@ -16,7 +16,7 @@ class InverterEnergyData:
         
     def initializeShema(self):
         self.logger.debug('Initializing schema...')
-        self.sql.execute('CREATE TABLE IF NOT EXISTS energy (timestamp TEXT, energy INTEGER)')
+        self.sql.execute('CREATE TABLE IF NOT EXISTS energy (timestamp TEXT, input INTEGER, output INTEGER)')
         self.connection.commit()
 
     def InitializeData(self):

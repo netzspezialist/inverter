@@ -6,6 +6,19 @@ from inverter_response import InverterResponseConverter
 
 REGEX_INVERTER_FLOAT = '[0-9][0-9]\.[0-9]'
 
+ENERGY_COMMANDS = { 
+    "QET": "^$", 
+    "QEY": "^[0-9][0-9][0-9][0-9]$", 
+    "QEM": "^[0-9][0-9][0-9][0-9][0-1][0-9]$", 
+    "QED": "^[0-9][0-9][0-9][0-9][0-1][0-9][0-3][0-9]$", 
+    "QLT": "^$", 
+    "QLY": "^[0-9][0-9][0-9][0-9]$", 
+    "QLM": "^[0-9][0-9][0-9][0-9][0-1][0-9]$", 
+    "QLD": "^[0-9][0-9][0-9][0-9][0-1][0-9][0-3][0-9]$", 
+}
+  
+
+
 class InverterCommands:
     def __init__(self, inverterConnection : InverterConnection, logger=None):
         self.inverterConnection = inverterConnection
@@ -45,8 +58,19 @@ class InverterCommands:
 
         return data
     
-    def qet(self):
-        self.logger.debug('Getting total input...')
+    def energy(self, command, timestamp):
+        self.logger.debug('Getting energy data...')
+
+        command = command.upper()
+
+        commandValidator = ENERGY_COMMANDS.get("command")
+
+        if commandValidator is None:
+            raise ValueError("Invalid command")
+        
+        if not re.search(commandValidator, timestamp):
+            raise ValueError("Invalid command value")
+
         startTime = datetime.now()        
         response = self.inverterConnection.execute("QET")
         stopTime = datetime.now()
