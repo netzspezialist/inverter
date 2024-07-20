@@ -58,7 +58,11 @@ class InverterMonitor:
                                 self.logger.info("Inverter settings updated successfully")
                                 # Update last execution date to today
                                 self.last_execution_date = now.date()
-                                            
+                            else:    
+                                self.logger.error("Inverter bulk setting update failed")
+                        else:   
+                            self.logger.error("Inverter float setting update failed")                                                                                            
+
                 data = self.inverterCommands.qpigs()
                 self.influx.upload_qpigs(data["timestamp"], data)
                 self.logger.debug(f'Inverter data: {data}')
