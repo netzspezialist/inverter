@@ -41,7 +41,7 @@ class InverterMonitor:
 
                 # Reset bulk and float voltage to standard values at 20:00
                 now = datetime.now()
-                specific_time = now.replace(hour=17, minute=40, second=0, microsecond=0)
+                specific_time = now.replace(hour=20, minute=00, second=0, microsecond=0)
 
                 # Check if current date is different from last execution date
                 if self.last_execution_date != now.date():
