@@ -48,13 +48,15 @@ class InverterMonitor:
                     # If current time is close to the specific time (within 600 seconds here)
                     if abs((now - specific_time).total_seconds()) < 600:
                         self.logger.info("Resetting inverter settings to standard values")
-                        response_string = self.inverterCommands.updateSetting("batteryFloatVoltage", "54.6")
+                        response = self.inverterCommands.updateSetting("batteryFloatVoltage", "54.6")
+                        response_string = str(response)
                         self.logger.info(f'Update batteryFloatVoltage response: {response_string}')
                         if "ACK" in response_string:
                             await asyncio.sleep(2)
-                            response_string = self.inverterCommands.updateSetting("batteryBulkVoltage", "54.6")
+                            response = self.inverterCommands.updateSetting("batteryBulkVoltage", "54.6")
+                            response_string = str(response)
                             self.logger.info(f'Update batteryBulkVoltage response: {response_string}')
-                            if "ACK" in response_string:
+                            if "ACK" in response_string.strip():
                                 self.logger.info("Inverter settings updated successfully")
                                 # Update last execution date to today
                                 self.last_execution_date = now.date()
