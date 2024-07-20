@@ -41,7 +41,7 @@ class InverterMonitor:
 
                 # Reset bulk and float voltage to standard values at 20:00
                 now = datetime.now()
-                specific_time = now.replace(hour=20, minute=0, second=0, microsecond=0)
+                specific_time = now.replace(hour=17, minute=20, second=0, microsecond=0)
 
                 # Check if current date is different from last execution date
                 if self.last_execution_date != now.date():
@@ -49,8 +49,11 @@ class InverterMonitor:
                     if abs((now - specific_time).total_seconds()) < 600:
                         self.logger.info("Resetting inverter settings to standard values")
                         response_string = self.inverterCommands.updateSetting("batteryFloatVoltage", "54.6")
-                        if "ACK" in response_string:                            
+                        self.logger.debug(f'Update batteryFloatVoltage response: {response_string}')
+                        if "ACK" in response_string:
+                            await asyncio.sleep(2)
                             response_string = self.inverterCommands.updateSetting("batteryBulkVoltage", "54.6")
+                            self.logger.debug(f'Update batteryBulkVoltage response: {response_string}')
                             if "ACK" in response_string:
                                 self.logger.info("Inverter settings updated successfully")
                                 # Update last execution date to today
