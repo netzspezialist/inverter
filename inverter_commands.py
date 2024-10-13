@@ -58,28 +58,29 @@ class InverterCommands:
 
         return data
     
-    def qet(self, command, timestamp):
+    def energy(self, command, timestamp):
         self.logger.debug('Getting energy data...')
 
         command = command.upper()
 
-        commandValidator = ENERGY_COMMANDS.get("command")
+        commandValidator = ENERGY_COMMANDS.get(command)
 
         if commandValidator is None:
             raise ValueError("Invalid command")
         
         if not re.search(commandValidator, timestamp):
             raise ValueError("Invalid command value")
+        
+        command = f"{command}{timestamp}"
 
         startTime = datetime.now()        
-        response = self.inverterConnection.execute("QET")
+        response = self.inverterConnection.execute(command)
         stopTime = datetime.now()
         self.logger.info(f'energy result: {response}')
 
-        command = "QET"
         timestamp = InverterResponseConverter.createTimeStamp(startTime, stopTime)
 
-        data = InverterResponseConverter.qet(command, timestamp, response)
+        data = InverterResponseConverter.energy(command, timestamp, response)
 
         self.logger.debug(f'energy data: {data}')
 

@@ -13,7 +13,7 @@ class InverterWebAPI(Flask):
         self.add_url_rule('/api/status', 'get_inverter_status', self.get_inverter_status, methods=['GET'])
         self.add_url_rule('/api/settings', 'get_inverter_settings', self.get_inverter_settings, methods=['GET'])
         self.add_url_rule('/api/settings', 'patch_inverter_settings', self.patch_inverter_settings, methods=['PATCH'])
-        self.add_url_rule('/api/energy', 'get_inverter_energy', self.get_inverter_energy, methods=['GET'])
+        self.add_url_rule('/api/energy', 'get_inverter_energy', self.get_inverter_energy, methods=['POST'])
         self.json.sort_keys = False
 
     def start(self):
@@ -47,13 +47,17 @@ class InverterWebAPI(Flask):
     
     def get_inverter_energy(self):
         self.logger.info('get inverter energy ...')
-        dataInput = self.inverterCommands.qet()
-        dataOutput = self.inverterCommands.qlt()
-        data = { 
-            "command": "energy", 
-            "timestamp": dataInput["timestamp"].isoformat()[:-3], 
-            "totalInput": dataInput["totalGenerated"],
-            "totalOutput": dataOutput["totalOutput"]
-        }        
+        data = request.get_json()
         self.logger.info(f'Inverter data: {data}')
-        return jsonify(data)
+        command = data["command"]
+        timestamp = data["timestamp"]
+        response = self.inverterCommands.energy(command, timestamp)
+
+        '''data = { 
+            "command": "energy", 
+            "timestamp": response["timestamp"].isoformat()[:-3], 
+            "energy": response["energy"],
+        }'''
+
+        self.logger.info(f'Inverter data: {data}')
+        return jsonify(response)

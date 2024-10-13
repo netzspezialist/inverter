@@ -53,33 +53,15 @@ class InverterConnection:
         self.connected = False
         self.logger.info('Inverter connection closed')
 
-
-    def execute(self, command):
-        self.__open()
-        
-        self.logger.debug(f'Inverter execute command {[command]}')
-
-        with self.lock:
-            response = self.send_command(command)
-
-        if response is None:
-            raise ConnectionError('No response from inverter')
-
-        self.logger.debug(f'Inverter execute response [{response}]')
-
-        self.__close()
-
-        return response
-
-    def send_command(self, command):
+    def __send_command(self, command):
         encoded_cmd = command.encode('ascii')
         b_cmd = encoded_cmd            
         i_crc = self.xmodem_crc_func(b_cmd)
-        h_crc = self.hex2(i_crc)
+        h_crc = self.__hex2(i_crc)
         self.logger.debug(f'crc hex {h_crc}')
         h_crc = h_crc.replace('0x','',1)
         i_cmd = int.from_bytes(b_cmd, 'big')
-        h_cmd = self.hex2(i_cmd)
+        h_cmd = self.__hex2(i_cmd)
         self.logger.debug(f'command hex {h_cmd}')
         h_cmd = h_cmd.replace('0x','',1)
         command_crc = h_cmd + h_crc + "0d"
@@ -123,6 +105,22 @@ class InverterConnection:
 
         return response
     
-    def hex2(self, n):
+    def __hex2(self, n):
         x = '%x' % (n,)
         return ('0' * (len(x) % 2)) + x
+    
+    def execute(self, command):
+        
+        self.logger.debug(f'Inverter execute command {[command]}')
+
+        with self.lock:
+            self.__open()
+            response = self.__send_command(command)
+            self.__close()
+
+        if response is None:
+            raise ConnectionError('No response from inverter')
+
+        self.logger.debug(f'Inverter execute response [{response}]')
+
+        return response

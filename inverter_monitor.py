@@ -65,10 +65,13 @@ class InverterMonitor:
                             self.logger.error("Inverter float setting update failed")
 
                 data = self.inverterCommands.qpigs()
+                
                 self.influx.upload_qpigs(data["timestamp"], data)
                 self.logger.debug(f'Inverter data: {data}')
+                
                 data["timestamp"] = data["timestamp"].isoformat()[:-3]
                 jsonData = json.dumps(data, default=self.serialize_datetime)
+                
                 self.logger.debug(f'Publishing to MQTT: {jsonData}')
                 self.mqtt.publish_message("qpigs", jsonData)
                 

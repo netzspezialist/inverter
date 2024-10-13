@@ -16,14 +16,14 @@ class InverterEnergyData:
         
     def initializeShema(self):
         self.logger.debug('Initializing schema...')
-        self.sql.execute('CREATE TABLE IF NOT EXISTS energy (timestamp TEXT, input INTEGER, output INTEGER)')
+        self.sql.execute('CREATE TABLE IF NOT EXISTS EnergyOutput (timestamp TEXT, input INTEGER, output INTEGER)')
         self.connection.commit()
 
     def InitializeData(self):
         self.logger.debug('Initializing energy data...')
         qet = self.inverterCommands.energy()
-        self.sql.execute(f'INSERT INTO energy (timestamp, energy) VALUES ("9999", {qet})')
+        self.sql.execute(f'INSERT INTO energy (timestamp, EnergyOutput) VALUES ("9999", {qet})')
     
-    def getEnergyData(self):
-        self.logger.debug('Getting energy data...')
-        self.sql.execute('SELECT * FROM energy')
+    def getEnergyOutput(self, timestamp):
+        self.logger.debug(f'Getting energy data from [{timestamp}]')
+        self.sql.execute('SELECT * FROM EnergyOutput')
