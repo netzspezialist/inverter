@@ -110,17 +110,15 @@ class InverterConnection:
         return ('0' * (len(x) % 2)) + x
     
     def execute(self, command):
-        
-        self.logger.debug(f'Inverter execute command {[command]}')
-
         with self.lock:
+            self.logger.debug(f'Inverter execute command {[command]}')    
             self.__open()
             response = self.__send_command(command)
             self.__close()
 
-        if response is None:
-            raise ConnectionError('No response from inverter')
+            if response is None:
+                raise ConnectionError('No response from inverter')
 
-        self.logger.debug(f'Inverter execute response [{response}]')
+            self.logger.debug(f'Inverter execute response [{response}]')
 
-        return response
+            return response
