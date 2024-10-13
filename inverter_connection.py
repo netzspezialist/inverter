@@ -11,7 +11,6 @@ class InverterConnection:
     def __init__(self, logger=None):
         self.logger = logger
         self.xmodem_crc_func = crcmod.predefined.mkCrcFun('xmodem')
-        self.connected = False
         self.lock = threading.Lock()
 
         self.connectionType = inverterConfig["connectionType"]        
@@ -20,7 +19,7 @@ class InverterConnection:
         if not os.path.exists(self.port):
             raise FileNotFoundError('Port not found')
 
-    def open(self):
+    def __open(self):
         try:
             if self.connectionType == 'serial':
                 self.logger.info('Opening inverter connection serial port')    
@@ -41,13 +40,12 @@ class InverterConnection:
                 self.logger.info('Opening inverter connection USB port')    
                 self.usb.port = os.open(self.usb.port, os.O_RDWR | os.O_NONBLOCK)
 
-            self.connected = True
             self.logger.info('Inverter connection opened')
         except Exception as e:
             self.logger.error(f"error open USB port: {e}")
 
 
-    def close(self):
+    def __close(self):
         if self.connectionType == 'serial':
             self.ser.close()
         else:
@@ -57,8 +55,7 @@ class InverterConnection:
 
 
     def execute(self, command):
-        if not self.connected:
-            raise ConnectionError('Connect first')
+        self.__open()
         
         self.logger.debug(f'Inverter execute command {[command]}')
 
@@ -69,6 +66,8 @@ class InverterConnection:
             raise ConnectionError('No response from inverter')
 
         self.logger.debug(f'Inverter execute response [{response}]')
+
+        self.__close()
 
         return response
 

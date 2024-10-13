@@ -43,7 +43,7 @@ class InverterBatteryManager:
     def on_message(self, client, userdata, message):
         self.logger.debug(f'Message received: {message.payload.decode()}')
 
-    def setVolate(self, targetVoltage):
+    def setVoltage(self, targetVoltage):
         self.logger.debug(f'Setting voltage to {targetVoltage}')
 
         currentSettings = self.inverterCommands.qpiri()

@@ -1,12 +1,14 @@
 from flask import Flask, jsonify, request
 from datetime import datetime
 from inverter_commands import InverterCommands
+from inverter_bms_state import BMSStateManager
 
 class InverterWebAPI(Flask):
-    def __init__(self, logger, inverterCommands : InverterCommands): 
+    def __init__(self, logger, inverterCommands : InverterCommands, bmsStateManager : BMSStateManager): 
         # Initialize your class here
         self.logger = logger
         self.inverterCommands = inverterCommands
+        self.bmsStateManager = bmsStateManager
 
         super().__init__(__name__)
 
@@ -14,6 +16,7 @@ class InverterWebAPI(Flask):
         self.add_url_rule('/api/settings', 'get_inverter_settings', self.get_inverter_settings, methods=['GET'])
         self.add_url_rule('/api/settings', 'patch_inverter_settings', self.patch_inverter_settings, methods=['PATCH'])
         self.add_url_rule('/api/energy', 'get_inverter_energy', self.get_inverter_energy, methods=['GET'])
+        self.add_url_rule('/api/bms', 'put_bms_state', self.put_bms_state, methods=['put'])
         self.json.sort_keys = False
 
     def start(self):
@@ -57,5 +60,14 @@ class InverterWebAPI(Flask):
         }        
         self.logger.info(f'Inverter data: {data}')
         return jsonify(data)
+    
+    def put_bms_state(self):
+        self.logger.info('set bms status ...')
+        data = request.get_json()
+        self.logger.info(f'BMS data: {data}')
+        
+        # Set the BMS state
+        self.bmsStateManager.set_bms_state(data)
+
 
     

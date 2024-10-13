@@ -58,7 +58,7 @@ class InverterCommands:
 
         return data
     
-    def energy(self, command, timestamp):
+    def qet(self, command, timestamp):
         self.logger.debug('Getting energy data...')
 
         command = command.upper()

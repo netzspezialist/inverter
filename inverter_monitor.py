@@ -4,10 +4,11 @@ import json
 from inverter_commands import InverterCommands
 from inverter_influx import InverterInflux
 from inverter_mqtt import InverterMqtt
+from inverter_bms_state import BMSStateManager
 
 
 class InverterMonitor:
-    def __init__(self, logger, inverterCommands: InverterCommands):
+    def __init__(self, logger, inverterCommands: InverterCommands, bmsStateManager : BMSStateManager):
         self.logger = logger
         self.influx = InverterInflux(logger)
         self.inverterCommands = inverterCommands
@@ -30,12 +31,12 @@ class InverterMonitor:
 
     def stop(self):
         self.logger.info('Stopping inverter monitoring ...')
-        self.serviceRunning = False    
+        self.serviceRunning = False
         self.mqtt.disconnect()
 
     async def loop(self):
         self.logger.info('Inverter monitor loop started ')
-        while self.serviceRunning:  
+        while self.serviceRunning:
             try:
                 self.logger.debug('Inverter monitor loop running ...')
 
@@ -48,22 +49,22 @@ class InverterMonitor:
                     # If current time is close to the specific time (within 600 seconds here)
                     if abs((now - specific_time).total_seconds()) < 600:
                         self.logger.info("Resetting inverter settings to standard values")
-                        response = self.inverterCommands.updateSetting("batteryFloatVoltage", "54.6")
+                        response = self.inverterCommands.updateSetting("batteryFloatVoltage", "54.8")
                         response_string = str(response)
                         self.logger.info(f'Update batteryFloatVoltage response: {response_string}')
                         if "ACK" in response_string:
                             await asyncio.sleep(2)
-                            response = self.inverterCommands.updateSetting("batteryBulkVoltage", "54.6")
+                            response = self.inverterCommands.updateSetting("batteryBulkVoltage", "54.8")
                             response_string = str(response)
                             self.logger.info(f'Update batteryBulkVoltage response: {response_string}')
                             if "ACK" in response_string.strip():
                                 self.logger.info("Inverter settings updated successfully")
                                 # Update last execution date to today
                                 self.last_execution_date = now.date()
-                            else:    
+                            else:
                                 self.logger.error("Inverter bulk setting update failed")
-                        else:   
-                            self.logger.error("Inverter float setting update failed")                                                                                            
+                        else:
+                            self.logger.error("Inverter float setting update failed")
 
                 data = self.inverterCommands.qpigs()
                 self.influx.upload_qpigs(data["timestamp"], data)

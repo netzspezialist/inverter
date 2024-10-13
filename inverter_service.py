@@ -9,6 +9,7 @@ from inverter_connection import InverterConnection
 from inverter_monitor import InverterMonitor
 from inverter_commands import InverterCommands
 from inverter_webapi import InverterWebAPI
+from inverter_bms_state import BMSStateManager
 
 class InverterService:
     def __init__(self, logger=None):       
@@ -20,14 +21,14 @@ class InverterService:
         self.inverterConnection = InverterConnection(logger)
         self.inverterCommands = InverterCommands(self.inverterConnection, logger)
 
-        self.inverterMonitor = InverterMonitor(logger, self.inverterCommands)   
-        self.inverterWebAPI = InverterWebAPI(logger, self.inverterCommands)
+        self.bmsStateMananger = BMSStateManager(logger)
+
+        self.inverterMonitor = InverterMonitor(logger, self.inverterCommands, self.bmsStateMananger)   
+        self.inverterWebAPI = InverterWebAPI(logger, self.inverterCommands, self.bmsStateMananger)
         self.inverterWebAPIThread = Thread(target = self.inverterWebAPI.start)
 
     def start(self):
         self.logger.info('Starting inverter service ...')
-
-        self.inverterConnection.open()
 
         self.inverterMonitorThread = Thread(target = self.inverterMonitor.start)
         self.inverterMonitorThread.start()
@@ -50,7 +51,7 @@ class InverterService:
 if __name__ == '__main__':
 
     logger = logging.getLogger(__name__)
-    logger.setLevel(logging.INFO)
+    logger.setLevel(logging.DEBUG)
 
 
     script_path = abspath(dirname(__file__))

@@ -17,7 +17,7 @@ mqtt = {
 inverterBatteryManager = {
     "enabled": True,
     "topic": "bms-commands",
-    "defaultVoltage": "54.6"
+    "defaultVoltage": "54.8"
 }
 inverter = {
     "connectionType": "serial",  # serial or usb

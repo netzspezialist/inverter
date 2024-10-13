@@ -27,8 +27,6 @@ def main():
 
     inverter = InverterConnection(logger)
 
-    inverter.open()
-
     inverter.execute(cmd)
 
     inverter.close()
