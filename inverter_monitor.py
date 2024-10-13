@@ -4,11 +4,9 @@ import json
 from inverter_commands import InverterCommands
 from inverter_influx import InverterInflux
 from inverter_mqtt import InverterMqtt
-from inverter_bms_state import BMSStateManager
-
 
 class InverterMonitor:
-    def __init__(self, logger, inverterCommands: InverterCommands, bmsStateManager : BMSStateManager):
+    def __init__(self, logger, inverterCommands: InverterCommands):
         self.logger = logger
         self.influx = InverterInflux(logger)
         self.inverterCommands = inverterCommands

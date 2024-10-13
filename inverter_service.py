@@ -9,7 +9,6 @@ from inverter_connection import InverterConnection
 from inverter_monitor import InverterMonitor
 from inverter_commands import InverterCommands
 from inverter_webapi import InverterWebAPI
-from inverter_bms_state import BMSStateManager
 
 class InverterService:
     def __init__(self, logger=None):       
@@ -21,10 +20,8 @@ class InverterService:
         self.inverterConnection = InverterConnection(logger)
         self.inverterCommands = InverterCommands(self.inverterConnection, logger)
 
-        self.bmsStateMananger = BMSStateManager(logger)
-
-        self.inverterMonitor = InverterMonitor(logger, self.inverterCommands, self.bmsStateMananger)   
-        self.inverterWebAPI = InverterWebAPI(logger, self.inverterCommands, self.bmsStateMananger)
+        self.inverterMonitor = InverterMonitor(logger, self.inverterCommands)   
+        self.inverterWebAPI = InverterWebAPI(logger, self.inverterCommands)
         self.inverterWebAPIThread = Thread(target = self.inverterWebAPI.start)
 
     def start(self):
@@ -45,7 +42,6 @@ class InverterService:
     def stop(self):
         self.logger.info('Stopping inverter service ...')
         self.inverterMonitor.stop()
-        self.inverterConnection.close()
 
 
 if __name__ == '__main__':

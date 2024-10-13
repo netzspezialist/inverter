@@ -26,10 +26,8 @@ def main():
     logger.addHandler(stdout_handler)
 
     inverter = InverterConnection(logger)
-
     inverter.execute(cmd)
 
-    inverter.close()
         
 if __name__ == '__main__':
     main()
