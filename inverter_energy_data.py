@@ -24,7 +24,7 @@ class InverterEnergyData:
         self.logger.debug(f'Total changes: {totalChanges}')
         self.__initializeData()
 
-    def __InitializeData(self):
+    def __initializeData(self):
         self.logger.debug('Initializing energy data...')
         #qet = self.inverterCommands.energy()
         #self.sql.execute(f'INSERT INTO energy (timestamp, EnergyOutput) VALUES ("9999", {qet})')
