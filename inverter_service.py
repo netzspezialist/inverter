@@ -31,6 +31,9 @@ class InverterService:
 
         self.inverterMonitorThread = Thread(target = self.inverterMonitor.start)
         self.inverterMonitorThread.start()
+
+        self.inverterEnergyDataThread = Thread(target = self.inverterEnergyData.start)
+        self.inverterEnergyDataThread.start()
         
         self.logger.info('Starting inverter web API ...')    
         self.inverterWebAPIThread.start()
@@ -44,6 +47,7 @@ class InverterService:
     def stop(self):
         self.logger.info('Stopping inverter service ...')
         self.inverterMonitor.stop()
+        self.inverterEnergyData.stop()
 
 
 if __name__ == '__main__':

@@ -1,4 +1,5 @@
 import sqlite3
+import asyncio
 
 from os.path import dirname, abspath
 from logging import Logger
@@ -19,8 +20,6 @@ class InverterEnergyData:
         self.logger.info(f'SQLite version: {sqlVersion.fetchone()}')
         self.__initializeShema()
         self.__initializeData()
-        self.serviceRunning = True
-        self.__loop()
         
     def __initializeShema(self):
         self.logger.debug('Initializing schema...')
@@ -43,16 +42,35 @@ class InverterEnergyData:
         #qet = self.inverterCommands.energy()
         #self.sql.execute(f'INSERT INTO energy (timestamp, EnergyOutput) VALUES ("9999", {qet})')
 
-    def __loop(self):
+    async def __loop(self):
         self.logger.info('Inverter energy data loop started')
         while self.serviceRunning:
             try:
                 self.logger.debug('Inverter energy data loop running ...')
-                self.getEnergyOutput(0)
+                
+                await asyncio.sleep(60)
             except Exception as e:
                 self.logger.error(f'Error in inverter energy data loop: {e}')
             finally:
                 pass
+
+
+    def start(self):
+        self.logger.info('Starting energy monitoring ...')        
+        self.serviceRunning = True
+
+        loop = asyncio.new_event_loop()
+        loop.create_task(self.__loop())
+        try:
+            loop.run_forever()      
+        finally:
+            loop.close()
+
+        self.logger.info('Inverter monitoring stopped')
+
+    def stop(self):
+        self.logger.info('Stopping inverter monitoring ...')
+        self.serviceRunning = False               
     
     def getEnergyOutput(self, timestamp: int):
         self.logger.debug(f'Getting energy data from [{timestamp}]')
