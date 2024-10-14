@@ -22,7 +22,7 @@ class InverterService:
         self.inverterCommands = InverterCommands(self.inverterConnection, logger)
 
         self.inverterMonitor = InverterMonitor(logger, self.inverterCommands)
-        self.inverterEnergyData = InverterEnergyData(logger, self.inverterCommands)
+        #self.inverterEnergyData = InverterEnergyData(logger, self.inverterCommands)
         self.inverterWebAPI = InverterWebAPI(logger, self.inverterCommands)
         self.inverterWebAPIThread = Thread(target = self.inverterWebAPI.start)        
 
