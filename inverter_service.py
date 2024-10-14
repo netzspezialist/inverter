@@ -21,11 +21,10 @@ class InverterService:
         self.inverterConnection = InverterConnection(logger)
         self.inverterCommands = InverterCommands(self.inverterConnection, logger)
 
-        self.inverterMonitor = InverterMonitor(logger, self.inverterCommands)   
-        self.inverterWebAPI = InverterWebAPI(logger, self.inverterCommands)
-        self.inverterWebAPIThread = Thread(target = self.inverterWebAPI.start)
-
+        self.inverterMonitor = InverterMonitor(logger, self.inverterCommands)
         self.inverterEnergyData = InverterEnergyData(logger, self.inverterCommands)
+        self.inverterWebAPI = InverterWebAPI(logger, self.inverterCommands)
+        self.inverterWebAPIThread = Thread(target = self.inverterWebAPI.start)        
 
     def start(self):
         self.logger.info('Starting inverter service ...')
