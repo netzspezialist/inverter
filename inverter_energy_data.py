@@ -26,6 +26,13 @@ class InverterEnergyData:
 
     def __initializeData(self):
         self.logger.debug('Initializing energy data...')
+        self.sql.execute('SELECT * FROM EnergyOutput')
+        if self.sql.fetchone() is None:
+            self.sql.execute('INSERT INTO EnergyOutput (timestamp, value) VALUES (0, 0)')
+            self.connection.commit()
+            totalChanges = self.connection.total_changes
+            self.logger.debug(f'Total changes: {totalChanges}')
+            
         #qet = self.inverterCommands.energy()
         #self.sql.execute(f'INSERT INTO energy (timestamp, EnergyOutput) VALUES ("9999", {qet})')
     
