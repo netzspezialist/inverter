@@ -1,5 +1,6 @@
 import sqlite3
 
+from os.path import dirname, abspath
 from logging import Logger
 from inverter_commands import InverterCommands
 
@@ -7,7 +8,12 @@ class InverterEnergyData:
     def __init__(self, logger: Logger, inverterCommands: InverterCommands):        
         self.logger = logger
         self.inverterCommands = inverterCommands
-        self.connection = sqlite3.connect('inverter.db')
+
+        script_path = abspath(dirname(__file__))
+        dbPath = f'{script_path}/inverter.db'
+        self.logger.debug(f'Database path: {dbPath}')
+
+        self.connection = sqlite3.connect(dbPath)
         self.sql = self.connection.cursor()
         sqlVersion = self.sql.execute('SELECT SQLITE_VERSION()')
         self.logger.info(f'SQLite version: {sqlVersion.fetchone()}')
