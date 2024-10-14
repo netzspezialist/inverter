@@ -13,16 +13,18 @@ class InverterEnergyData:
         self.sql = self.connection.cursor()
         sqlVersion = self.sql.execute('SELECT SQLITE_VERSION()')
         self.logger.info(f'SQLite version: {sqlVersion.fetchone()}')
+        self.__initializeShema()
         
-    def initializeShema(self):
+    def __initializeShema(self):
         self.logger.debug('Initializing schema...')
         self.sql.execute('CREATE TABLE IF NOT EXISTS EnergyOutput (timestamp INTEGER, value INTEGER)')
         self.sql.execute('CREATE TABLE IF NOT EXISTS EnergyInput (timestamp INTEGER, value INTEGER)')
         self.connection.commit()
         totalChanges = self.connection.total_changes        
         self.logger.debug(f'Total changes: {totalChanges}')
+        self.__initializeData()
 
-    def InitializeData(self):
+    def __InitializeData(self):
         self.logger.debug('Initializing energy data...')
         #qet = self.inverterCommands.energy()
         #self.sql.execute(f'INSERT INTO energy (timestamp, EnergyOutput) VALUES ("9999", {qet})')
