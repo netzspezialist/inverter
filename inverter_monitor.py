@@ -4,6 +4,7 @@ import json
 from inverter_commands import InverterCommands
 from inverter_influx import InverterInflux
 from inverter_mqtt import InverterMqtt
+import logging
 
 class InverterMonitor:
     def __init__(self, logger, inverterCommands: InverterCommands):
@@ -11,28 +12,9 @@ class InverterMonitor:
         self.influx = InverterInflux(logger)
         self.inverterCommands = inverterCommands
         self.mqtt = InverterMqtt(logger)
-        self.last_execution_date = None  # Initialize last execution date
+        self.last_execution_date = None  # Initialize last execution date    
 
-    def start(self):
-        self.logger.info('Starting inverter monitoring ...')
-        self.serviceRunning = True
-        self.mqtt.connect()
-
-        loop = asyncio.new_event_loop()
-        loop.create_task(self.loop())
-        try:
-            loop.run_forever()      
-        finally:
-            loop.close()
-
-        self.logger.info('Inverter monitoring stopped')
-
-    def stop(self):
-        self.logger.info('Stopping inverter monitoring ...')
-        self.serviceRunning = False
-        self.mqtt.disconnect()
-
-    async def loop(self):
+    async def __loop(self):
         self.logger.info('Inverter monitor loop started ')
         while self.serviceRunning:
             try:
@@ -47,12 +29,12 @@ class InverterMonitor:
                     # If current time is close to the specific time (within 600 seconds here)
                     if abs((now - specific_time).total_seconds()) < 600:
                         self.logger.info("Resetting inverter settings to standard values")
-                        response = self.inverterCommands.updateSetting("batteryFloatVoltage", "54.8")
+                        response = self.inverterCommands.updateSetting("batteryFloatVoltage", "54.6")
                         response_string = str(response)
                         self.logger.info(f'Update batteryFloatVoltage response: {response_string}')
                         if "ACK" in response_string:
                             await asyncio.sleep(2)
-                            response = self.inverterCommands.updateSetting("batteryBulkVoltage", "54.8")
+                            response = self.inverterCommands.updateSetting("batteryBulkVoltage", "54.6")
                             response_string = str(response)
                             self.logger.info(f'Update batteryBulkVoltage response: {response_string}')
                             if "ACK" in response_string.strip():
@@ -70,7 +52,7 @@ class InverterMonitor:
                 self.logger.debug(f'Inverter data: {data}')
                 
                 data["timestamp"] = data["timestamp"].isoformat()[:-3]
-                jsonData = json.dumps(data, default=self.serialize_datetime)
+                jsonData = json.dumps(data, default=self.__serialize_datetime)
                 
                 self.logger.debug(f'Publishing to MQTT: {jsonData}')
                 self.mqtt.publish_message("qpigs", jsonData)
@@ -80,11 +62,29 @@ class InverterMonitor:
                 self.logger.error(f'Inverter monitor loop failed: {e}')
                 await asyncio.sleep(10)
 
+        self.mqtt.disconnect()
         self.logger.info('Inverter monitor loop stopped')
 
-    def serialize_datetime(obj): 
+    def __serialize_datetime(obj): 
         if isinstance(obj, datetime.datetime): 
             return obj.isoformat() 
         raise TypeError("Type not serializable") 
   
+    def start(self):
+        self.logger.info('Starting inverter monitoring ...')        
+        self.mqtt.connect()
+        self.serviceRunning = True
+
+        loop = asyncio.new_event_loop()
+        loop.create_task(self.__loop())
+        try:
+            loop.run_forever()      
+        finally:
+            loop.close()
+
+        self.logger.info('Inverter monitoring stopped')
+
+    def stop(self):
+        self.logger.info('Stopping inverter monitoring ...')
+        self.serviceRunning = False   
   

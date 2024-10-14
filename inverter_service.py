@@ -9,6 +9,7 @@ from inverter_connection import InverterConnection
 from inverter_monitor import InverterMonitor
 from inverter_commands import InverterCommands
 from inverter_webapi import InverterWebAPI
+from inverter_energy_data import InverterEnergyData
 
 class InverterService:
     def __init__(self, logger=None):       
@@ -23,6 +24,8 @@ class InverterService:
         self.inverterMonitor = InverterMonitor(logger, self.inverterCommands)   
         self.inverterWebAPI = InverterWebAPI(logger, self.inverterCommands)
         self.inverterWebAPIThread = Thread(target = self.inverterWebAPI.start)
+
+        self.inverterEnergyData = InverterEnergyData(logger, self.inverterCommands)
 
     def start(self):
         self.logger.info('Starting inverter service ...')
@@ -48,7 +51,6 @@ if __name__ == '__main__':
 
     logger = logging.getLogger(__name__)
     logger.setLevel(logging.DEBUG)
-
 
     script_path = abspath(dirname(__file__))
 
