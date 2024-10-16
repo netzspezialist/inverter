@@ -21,7 +21,7 @@ class InverterEnergyData:
         self.logger.debug(f'Total changes: {totalChanges}')
         
 
-    def __writingEnergyData(self):
+    async def __writingEnergyData(self):
         self.logger.debug('Initializing energy data...')
        
         current_year = year = datetime.datetime.now().year
@@ -86,6 +86,8 @@ class InverterEnergyData:
                         current_year = current_year - 1
                     else:
                         initYearsCompleted = True
+
+            await asyncio.sleep(5)
 
         self.initialRun = True
 
