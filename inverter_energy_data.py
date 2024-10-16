@@ -43,7 +43,7 @@ class InverterEnergyData:
         initYearsCompleted = False
 
         while not (initDaysCompleted and initMonthsCompleted and initYearsCompleted):
-            timestamp = current_year * 10000 + current_month * 100 + current_day            
+            timestamp = year * 10000 + month * 100 + day            
             if day > 0:
                 self.sql.execute(f'select * from EnergyOutput where timestamp = {timestamp}')
                 energyOutput = self.sql.fetchone()
