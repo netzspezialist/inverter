@@ -50,15 +50,15 @@ class InverterEnergyData:
             while not (initDaysCompleted and initMonthsCompleted and initYearsCompleted):
                 timestamp = current_year * 10000 + current_month * 100 + current_day
                 self.logger.debug(f'Initializing energy data for day [{timestamp}]')
-                if current_day >= 0:
+                if current_day > 0:
                     current_day = current_day - 1
                 else:
                     initDaysCompleted = True
-                    if current_month >= 0:
+                    if current_month > 0:
                         current_month = current_month - 1
                     else:
                         initMonthsCompleted = True
-                        if current_year >= 2022:
+                        if current_year > 2021:
                             current_year = current_year - 1
                         else:
                             initYearsCompleted = True
