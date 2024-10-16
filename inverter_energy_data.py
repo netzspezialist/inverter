@@ -35,11 +35,7 @@ class InverterEnergyData:
         self.logger.debug('Initializing energy data...')
         res = self.sql.execute('SELECT * FROM EnergyOutput')
         if res.fetchone() is None:
-            self.sql.execute('INSERT INTO EnergyOutput (timestamp, value) VALUES (0, 0)')
-            self.connection.commit()
-            totalChanges = self.connection.total_changes
-            self.logger.debug(f'Total changes: {totalChanges}')
-            
+            self.logger.debug('No energy data found. Initializing data ...')          
             current_year = datetime.datetime.now().year
             current_month = datetime.datetime.now().month
             current_day = datetime.datetime.now().day
