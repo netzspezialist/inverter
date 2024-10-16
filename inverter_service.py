@@ -18,7 +18,8 @@ class InverterService:
         signal.signal(signal.SIGQUIT, self.stop)
 
         self.logger = logger
-        self.inverterConnection = InverterConnection(logger)
+        #self.inverterConnection = InverterConnection(logger)
+        self.inverterConnection = InverterConnection()
         self.inverterCommands = InverterCommands(self.inverterConnection, logger)
 
         self.inverterMonitor = InverterMonitor(logger, self.inverterCommands)

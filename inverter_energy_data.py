@@ -52,7 +52,7 @@ class InverterEnergyData:
 
             elif month > 0:
                 initDaysCompleted = True
-                if current_month > 0:
+                if month > 0:
                     self.logger.debug(f'Updating energy data for month [{timestamp}]')
                     loadExists = self.__loadExists(timestamp)
                     load = 0
@@ -69,7 +69,7 @@ class InverterEnergyData:
                     month = month - 1
                 else:
                     initMonthsCompleted = True
-                    if current_year > 2021:
+                    if year > 2021:
                         self.logger.debug(f'Updating energy data for year [{timestamp}]')
                         loadExists = self.__loadExists(timestamp)
                         load = 0
