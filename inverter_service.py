@@ -17,9 +17,12 @@ class InverterService:
         signal.signal(signal.SIGTERM, self.stop) # Supervisor/process manager signals
         signal.signal(signal.SIGQUIT, self.stop)
 
-        self.logger = logger
-        #self.inverterConnection = InverterConnection(logger)
-        self.inverterConnection = InverterConnection()
+        self.logger = logger      
+
+        inverterConnectionLogger = logging.getLogger('inverterConnection')
+        inverterConnectionLogger.setLevel(logging.INFO)
+
+        self.inverterConnection = InverterConnection(inverterConnectionLogger)
         self.inverterCommands = InverterCommands(self.inverterConnection, logger)
 
         self.inverterMonitor = InverterMonitor(logger, self.inverterCommands)
