@@ -52,40 +52,41 @@ class InverterEnergyData:
 
             elif month > 0:
                 initDaysCompleted = True
-                if month > 0:
-                    self.logger.debug(f'Updating energy data for month [{timestamp}]')
-                    loadExists = self.__loadExists(timestamp)
-                    load = 0
+            
+                self.logger.debug(f'Updating energy data for month [{timestamp}]')
+                loadExists = self.__loadExists(timestamp)
+                load = 0
 
-                    if loadExists is False or month == current_month or month == current_month - 1:
-                        response = self.inverterCommands.energy('qlm', str(year * 100 + month))
-                        load = response["energy"]
+                if loadExists is False or month == current_month or month == current_month - 1:
+                    response = self.inverterCommands.energy('qlm', str(year * 100 + month))
+                    load = response["energy"]
 
-                    if loadExists is False:
-                        self.__insertLoad(timestamp, load)
-                    elif month == current_month:
-                        self.__updateLoad(timestamp, load)
+                if loadExists is False:
+                    self.__insertLoad(timestamp, load)
+                elif month == current_month:
+                    self.__updateLoad(timestamp, load)
 
-                    month = month - 1
-                else:
-                    initMonthsCompleted = True
-                    if year > 2021:
-                        self.logger.debug(f'Updating energy data for year [{timestamp}]')
-                        loadExists = self.__loadExists(timestamp)
-                        load = 0
+                month = month - 1
+            
+            elif year > 2021:
+                initMonthsCompleted = True
+    
+                self.logger.debug(f'Updating energy data for year [{timestamp}]')
+                loadExists = self.__loadExists(timestamp)
+                load = 0
 
-                        if loadExists is False or year == current_year:
-                            response = self.inverterCommands.energy('qly', str(year))
-                            load = response["energy"]
+                if loadExists is False or year == current_year:
+                    response = self.inverterCommands.energy('qly', str(year))
+                    load = response["energy"]
 
-                        if loadExists is False:
-                            self.__insertLoad(timestamp, load)
-                        elif year == current_year:
-                            self.__updateLoad(timestamp, load)
+                if loadExists is False:
+                    self.__insertLoad(timestamp, load)
+                elif year == current_year:
+                    self.__updateLoad(timestamp, load)
 
-                        year = year - 1
-                    else:
-                        initYearsCompleted = True            
+                year = year - 1
+            else:
+                initYearsCompleted = True            
 
         self.initialRun = True
 
