@@ -66,7 +66,7 @@ class InverterEnergyData:
                     elif month == current_month:
                         self.__updateLoad(timestamp, load)
 
-                    current_month = current_month - 1
+                    month = month - 1
                 else:
                     initMonthsCompleted = True
                     if current_year > 2021:
@@ -83,7 +83,7 @@ class InverterEnergyData:
                         elif year == current_year:
                             self.__updateLoad(timestamp, load)
 
-                        current_year = current_year - 1
+                        year = year - 1
                     else:
                         initYearsCompleted = True            
 
