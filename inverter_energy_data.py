@@ -62,35 +62,32 @@ class InverterEnergyData:
                         load = response["energy"]
 
                     if loadExists is False:
-                        self.logger.info(f'Insert load output [{load}] for month [{timestamp}]')
-                        self.sql.execute(f'INSERT INTO EnergyOutput (timestamp, value) VALUES ({timestamp}, {load})')
-                        self.connection.commit()
+                        self.__insertLoad(timestamp, load)
                     elif month == current_month:
-                        self.logger.info(f'Update load output [{load}] for day [{timestamp}]')
-                        self.sql.execute(f'UPDATE EnergyOutput SET value = {load} WHERE timestamp = {timestamp}')
-                        self.connection.commit()
+                        self.__updateLoad(timestamp, load)
 
                     current_month = current_month - 1
                 else:
                     initMonthsCompleted = True
                     if current_year > 2021:
-                        self.logger.debug(f'Writing energy data for year [{timestamp}]')
-                        self.sql.execute(f'select * from EnergyOutput where timestamp = {timestamp}')
-                        energyOutput = self.sql.fetchone()
-                        if energyOutput is None:
-                            self.sql.execute(f'INSERT INTO EnergyOutput (timestamp, value) VALUES ({timestamp}, 0)')
-                            self.connection.commit()
-                            totalChanges = self.connection.total_changes
-                            self.logger.debug(f'Total changes: {totalChanges}')
+                        self.logger.debug(f'Updating energy data for year [{timestamp}]')
+                        loadExists = self.__loadExists(timestamp)
+                        load = 0
+
+                        if loadExists is False or year == current_year:
+                            response = self.inverterCommands.energy('qly', str(year))
+                            load = response["energy"]
+
+                        if loadExists is False:
+                            self.__insertLoad(timestamp, load)
+                        elif year == current_year:
+                            self.__updateLoad(timestamp, load)
+
                         current_year = current_year - 1
                     else:
                         initYearsCompleted = True
 
-        self.initialRun = True        
-            #self.sql.execute(f'INSERT INTO EnergyOutput (timestamp, value) VALUES ({i}, {i})')
-            #self.connection.commit()
-            #totalChanges = self.connection.total_changes
-            #self.logger.debug(f'Total changes: {totalChanges}')
+        self.initialRun = True
 
     def __loadExists(self, timestamp: int):
         self.logger.debug(f'Checking if row exists for timestamp [{timestamp}]')
@@ -99,14 +96,14 @@ class InverterEnergyData:
         return energyOutput is not None
 
     def __insertLoad(self, timestamp: int, load: int):
-        self.logger.info(f'Inserting load output [{load}] for day [{timestamp}]')
+        self.logger.info(f'Inserting load output [{load}] for [{timestamp}]')
         self.sql.execute(f'INSERT INTO EnergyOutput (timestamp, value) VALUES ({timestamp}, {load})')
         self.connection.commit()
         totalChanges = self.connection.total_changes
         self.logger.debug(f'Total changes: {totalChanges}')
 
     def __updateLoad(self, timestamp: int, load: int):
-        self.logger.info(f'Updating load output [{load}] for day [{timestamp}]')
+        self.logger.info(f'Updating load output [{load}] for [{timestamp}]')
         self.sql.execute(f'UPDATE EnergyOutput SET value = {load} WHERE timestamp = {timestamp}')
         self.connection.commit()
         totalChanges = self.connection.total_changes
