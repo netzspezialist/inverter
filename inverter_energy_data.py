@@ -39,13 +39,13 @@ class InverterEnergyData:
                 loadExists = self.__loadExists(timestamp)
                 load = 0
                 
-                if loadExists is False or day == current_day or day == current_day - 1:
+                if loadExists is False or day == current_day:
                     response = self.inverterCommands.energy('qld', str(timestamp))
                     load = response["energy"]
                     
                 if loadExists is False:
                     self.__insertLoad(timestamp, load)
-                elif day == current_day or day == current_day - 1:
+                elif day == current_day:
                     self.__updateLoad(timestamp, load)
                 
                 day = day - 1
@@ -57,7 +57,7 @@ class InverterEnergyData:
                 loadExists = self.__loadExists(timestamp)
                 load = 0
 
-                if loadExists is False or month == current_month or month == current_month - 1:
+                if loadExists is False or month == current_month:
                     response = self.inverterCommands.energy('qlm', str(year * 100 + month))
                     load = response["energy"]
 
@@ -126,7 +126,7 @@ class InverterEnergyData:
             try:
                 self.logger.debug('Inverter energy data loop running ...')
                 self.__writingEnergyData()
-                await asyncio.sleep(60)
+                await asyncio.sleep(600)
             except Exception as e:
                 self.logger.error(f'Error in inverter energy data loop: {e}')
             finally:
