@@ -78,16 +78,16 @@ class InverterResponseConverter(object):
     @staticmethod
     def energy(command, timestamp, response):
 
-        energy = "0.0"
+        energy = 0
 
         if response[1:4] != "NAK":
             energy = int(response[2:10])        
-            energy = str(energy / 1000)
+            energy = energy
         
         data = { 
             "command": command, 
             "timestamp": timestamp, 
-            "energy": energy + " kWh"
+            "energy": energy
         }
         return data
 

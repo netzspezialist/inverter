@@ -33,36 +33,69 @@ class InverterEnergyData:
 
     def __initializeData(self):
         self.logger.debug('Initializing energy data...')
-        res = self.sql.execute('SELECT * FROM EnergyOutput')
-        if res.fetchone() is None:
-            self.logger.debug('No energy data found. Initializing data ...')          
-            current_year = datetime.datetime.now().year
-            current_month = datetime.datetime.now().month
-            current_day = datetime.datetime.now().day
-            initDaysCompleted = False
-            initMonthsCompleted = False
-            initYearsCompleted = False
+       
+        current_year = year = datetime.datetime.now().year
+        current_month = month = datetime.datetime.now().month
+        current_day = day = datetime.datetime.now().day
 
-            while not (initDaysCompleted and initMonthsCompleted and initYearsCompleted):
-                timestamp = current_year * 10000 + current_month * 100 + current_day
-                self.logger.debug(f'Initializing energy data for day [{timestamp}]')
-                if current_day > 0:
-                    current_day = current_day - 1
-                else:
-                    initDaysCompleted = True
-                    if current_month > 0:
-                        current_month = current_month - 1
-                    else:
-                        initMonthsCompleted = True
-                        if current_year > 2021:
-                            current_year = current_year - 1
-                        else:
-                            initYearsCompleted = True
+        initDaysCompleted = False
+        initMonthsCompleted = False
+        initYearsCompleted = False
+
+        while not (initDaysCompleted and initMonthsCompleted and initYearsCompleted):
+            timestamp = current_year * 10000 + current_month * 100 + current_day            
+            if day > 0:
+                self.sql.execute(f'select * from EnergyOutput where timestamp = {timestamp}')
+                energyOutput = self.sql.fetchone()
+                if energyOutput is None or day is current_day:
+                    response = self.inverterCommands.energy('qld', timestamp)
+                    load = response["energy"]
                     
-                #self.sql.execute(f'INSERT INTO EnergyOutput (timestamp, value) VALUES ({i}, {i})')
-                #self.connection.commit()
-                #totalChanges = self.connection.total_changes
-                #self.logger.debug(f'Total changes: {totalChanges}')
+                    if energyOutput is not None:
+                        self.sql.execute(f'INSERT INTO EnergyOutput (timestamp, value) VALUES ({timestamp}, {load})')
+                        self.logger.debug(f'Insert load output [{load}] for day [{timestamp}]')
+                    else:
+                        self.sql.execute(f'UPDATE EnergyOutput SET value = {load} WHERE timestamp = {timestamp}')
+                        self.logger.debug(f'Update load output [{load}] for day [{timestamp}]')
+                        
+                    self.connection.commit()
+                    totalChanges = self.connection.total_changes
+                    self.logger.debug(f'Total changes: {totalChanges}')                
+                    day = day - 1
+                else:
+                    if day == current_day:
+                        self.logger.debug(f'Energy data for day [{timestamp}] [{energyOutput}] already exists')
+            else:
+                initDaysCompleted = True
+                if current_month > 0:
+                    self.logger.debug(f'Writing energy data for month [{timestamp}]')
+                    self.sql.execute(f'select * from EnergyOutput where timestamp = {timestamp}')
+                    energyOutput = self.sql.fetchone()
+                    if energyOutput is None:
+                        self.sql.execute(f'INSERT INTO EnergyOutput (timestamp, value) VALUES ({timestamp}, 0)')
+                        self.connection.commit()
+                        totalChanges = self.connection.total_changes
+                        self.logger.debug(f'Total changes: {totalChanges}')
+                    current_month = current_month - 1
+                else:
+                    initMonthsCompleted = True
+                    if current_year > 2021:
+                        self.logger.debug(f'Writing energy data for year [{timestamp}]')
+                        self.sql.execute(f'select * from EnergyOutput where timestamp = {timestamp}')
+                        energyOutput = self.sql.fetchone()
+                        if energyOutput is None:
+                            self.sql.execute(f'INSERT INTO EnergyOutput (timestamp, value) VALUES ({timestamp}, 0)')
+                            self.connection.commit()
+                            totalChanges = self.connection.total_changes
+                            self.logger.debug(f'Total changes: {totalChanges}')
+                        current_year = current_year - 1
+                    else:
+                        initYearsCompleted = True
+                
+            #self.sql.execute(f'INSERT INTO EnergyOutput (timestamp, value) VALUES ({i}, {i})')
+            #self.connection.commit()
+            #totalChanges = self.connection.total_changes
+            #self.logger.debug(f'Total changes: {totalChanges}')
 
 
     async def __loop(self):
