@@ -1,5 +1,6 @@
 import sqlite3
 import asyncio
+import datetime
 
 from os.path import dirname, abspath
 from logging import Logger
@@ -38,9 +39,35 @@ class InverterEnergyData:
             self.connection.commit()
             totalChanges = self.connection.total_changes
             self.logger.debug(f'Total changes: {totalChanges}')
+            
+            current_year = datetime.datetime.now().year
+            current_month = datetime.datetime.now().month
+            current_day = datetime.datetime.now().day
+            initDaysCompleted = False
+            initMonthsCompleted = False
+            initYearsCompleted = False
 
-        #qet = self.inverterCommands.energy()
-        #self.sql.execute(f'INSERT INTO energy (timestamp, EnergyOutput) VALUES ("9999", {qet})')
+            while not initDaysCompleted and not initMonthsCompleted and not initYearsCompleted:
+                timestamp = current_year * 10000 + current_month * 100 + current_day
+                self.logger.debug(f'Initializing energy data for day [{timestamp}]')
+                if current_day >= 0:
+                    current_day = current_day - 1
+                else:
+                    initDaysCompleted = True
+                    if current_month >= 0:
+                        current_month = current_month - 1
+                    else:
+                        initMonthsCompleted = True
+                        if current_year >= 2022:
+                            current_year = current_year - 1
+                        else:
+                            initYearsCompleted = True
+                    
+                #self.sql.execute(f'INSERT INTO EnergyOutput (timestamp, value) VALUES ({i}, {i})')
+                #self.connection.commit()
+                #totalChanges = self.connection.total_changes
+                #self.logger.debug(f'Total changes: {totalChanges}')
+
 
     async def __loop(self):
         self.logger.info('Inverter energy data loop started')
@@ -66,10 +93,10 @@ class InverterEnergyData:
         finally:
             loop.close()
 
-        self.logger.info('Inverter monitoring stopped')
+        self.logger.info('Inverter energy monitoring stopped')
 
     def stop(self):
-        self.logger.info('Stopping inverter monitoring ...')
+        self.logger.info('Stopping energy monitoring ...')
         self.serviceRunning = False               
     
     def getEnergyOutput(self, timestamp: int):
