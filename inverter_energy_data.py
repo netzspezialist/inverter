@@ -48,7 +48,7 @@ class InverterEnergyData:
                 self.sql.execute(f'select * from EnergyOutput where timestamp = {timestamp}')
                 energyOutput = self.sql.fetchone()
                 if energyOutput is None or day is current_day:
-                    response = self.inverterCommands.energy('qld', timestamp)
+                    response = self.inverterCommands.energy('qld', str(timestamp))
                     load = response["energy"]
                     
                     if energyOutput is not None:
@@ -57,7 +57,7 @@ class InverterEnergyData:
                     else:
                         self.sql.execute(f'UPDATE EnergyOutput SET value = {load} WHERE timestamp = {timestamp}')
                         self.logger.debug(f'Update load output [{load}] for day [{timestamp}]')
-                        
+
                     self.connection.commit()
                     totalChanges = self.connection.total_changes
                     self.logger.debug(f'Total changes: {totalChanges}')                
