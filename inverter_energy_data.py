@@ -20,7 +20,7 @@ class InverterEnergyData:
         sqlVersion = self.sql.execute('SELECT SQLITE_VERSION()')
         self.logger.info(f'SQLite version: {sqlVersion.fetchone()}')
         self.__initializeShema()
-        self.__initializeData()
+        self.initialRun = True
         
     def __initializeShema(self):
         self.logger.debug('Initializing schema...')
@@ -31,7 +31,7 @@ class InverterEnergyData:
         self.logger.debug(f'Total changes: {totalChanges}')
         
 
-    def __initializeData(self):
+    def __writingEnergyData(self):
         self.logger.debug('Initializing energy data...')
        
         current_year = year = datetime.datetime.now().year
@@ -46,38 +46,39 @@ class InverterEnergyData:
             timestamp = year * 10000 + month * 100 + day            
             if day > 0:
                 self.logger.debug(f'Updating energy data for day [{timestamp}]')
-                self.sql.execute(f'select * from EnergyOutput where timestamp = {timestamp}')
-                energyOutput = self.sql.fetchone()
+                loadExists = self.__loadExists(timestamp)
                 load = 0
                 
-                if energyOutput is None or day == current_day:
+                if loadExists is False or day == current_day or day == current_day - 1:
                     response = self.inverterCommands.energy('qld', str(timestamp))
                     load = response["energy"]
                     
-                if energyOutput is None:
-                    self.logger.debug(f'Insert load output [{load}] for day [{timestamp}]')
-                    self.sql.execute(f'INSERT INTO EnergyOutput (timestamp, value) VALUES ({timestamp}, {load})')
-                    self.connection.commit()
-                elif day == current_day:
-                    self.logger.debug(f'Update load output [{load}] for day [{timestamp}]')
-                    self.sql.execute(f'UPDATE EnergyOutput SET value = {load} WHERE timestamp = {timestamp}')
-                    self.connection.commit()
-                
-                totalChanges = self.connection.total_changes
-                self.logger.debug(f'Total changes: {totalChanges}')
+                if loadExists is False:
+                    self.__insertLoad(timestamp, load)
+                elif day == current_day or day == current_day - 1:
+                    self.__updateLoad(timestamp, load)
                 day = day - 1
 
-            else:
+            elif month > 0:
                 initDaysCompleted = True
                 if current_month > 0:
-                    self.logger.debug(f'Writing energy data for month [{timestamp}]')
-                    self.sql.execute(f'select * from EnergyOutput where timestamp = {timestamp}')
-                    energyOutput = self.sql.fetchone()
-                    if energyOutput is None:
-                        self.sql.execute(f'INSERT INTO EnergyOutput (timestamp, value) VALUES ({timestamp}, 0)')
+                    self.logger.debug(f'Updating energy data for month [{timestamp}]')
+                    loadExists = self.__loadExists(timestamp)
+                    load = 0
+
+                    if loadExists is False or month == current_month or month == current_month - 1:
+                        response = self.inverterCommands.energy('qlm', str(year * 10000 + month * 100))
+                        load = response["energy"]
+
+                    if loadExists is False:
+                        self.logger.info(f'Insert load output [{load}] for month [{timestamp}]')
+                        self.sql.execute(f'INSERT INTO EnergyOutput (timestamp, value) VALUES ({timestamp}, {load})')
                         self.connection.commit()
-                        totalChanges = self.connection.total_changes
-                        self.logger.debug(f'Total changes: {totalChanges}')
+                    elif month == current_month:
+                        self.logger.info(f'Update load output [{load}] for day [{timestamp}]')
+                        self.sql.execute(f'UPDATE EnergyOutput SET value = {load} WHERE timestamp = {timestamp}')
+                        self.connection.commit()
+
                     current_month = current_month - 1
                 else:
                     initMonthsCompleted = True
@@ -93,19 +94,39 @@ class InverterEnergyData:
                         current_year = current_year - 1
                     else:
                         initYearsCompleted = True
-                
+
+        self.initialRun = True        
             #self.sql.execute(f'INSERT INTO EnergyOutput (timestamp, value) VALUES ({i}, {i})')
             #self.connection.commit()
             #totalChanges = self.connection.total_changes
             #self.logger.debug(f'Total changes: {totalChanges}')
 
+    def __loadExists(self, timestamp: int):
+        self.logger.debug(f'Checking if row exists for timestamp [{timestamp}]')
+        self.sql.execute(f'select * from EnergyOutput where timestamp = {timestamp}')
+        energyOutput = self.sql.fetchone()
+        return energyOutput is not None
+
+    def __insertLoad(self, timestamp: int, load: int):
+        self.logger.info(f'Inserting load output [{load}] for day [{timestamp}]')
+        self.sql.execute(f'INSERT INTO EnergyOutput (timestamp, value) VALUES ({timestamp}, {load})')
+        self.connection.commit()
+        totalChanges = self.connection.total_changes
+        self.logger.debug(f'Total changes: {totalChanges}')
+
+    def __updateLoad(self, timestamp: int, load: int):
+        self.logger.info(f'Updating load output [{load}] for day [{timestamp}]')
+        self.sql.execute(f'UPDATE EnergyOutput SET value = {load} WHERE timestamp = {timestamp}')
+        self.connection.commit()
+        totalChanges = self.connection.total_changes
+        self.logger.debug(f'Total changes: {totalChanges}')
 
     async def __loop(self):
         self.logger.info('Inverter energy data loop started')
         while self.serviceRunning:
             try:
                 self.logger.debug('Inverter energy data loop running ...')
-                
+                self.__writingEnergyData()
                 await asyncio.sleep(60)
             except Exception as e:
                 self.logger.error(f'Error in inverter energy data loop: {e}')
