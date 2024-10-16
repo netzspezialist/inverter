@@ -58,7 +58,7 @@ class InverterEnergyData:
                     load = 0
 
                     if loadExists is False or month == current_month or month == current_month - 1:
-                        response = self.inverterCommands.energy('qlm', str(year * 10000 + month * 100))
+                        response = self.inverterCommands.energy('qlm', str(year * 100 + month))
                         load = response["energy"]
 
                     if loadExists is False:

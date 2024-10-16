@@ -59,7 +59,7 @@ class InverterCommands:
         return data
     
     def energy(self, command, timestamp):
-        self.logger.debug('Getting energy data...')
+        self.logger.debug(f'Getting energy data [{command}{timestamp}]')
 
         command = command.upper()
 
