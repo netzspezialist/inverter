@@ -10,16 +10,6 @@ class InverterEnergyData:
     def __init__(self, logger: Logger, inverterCommands: InverterCommands):        
         self.logger = logger
         self.inverterCommands = inverterCommands
-
-        script_path = abspath(dirname(__file__))
-        dbPath = f'{script_path}/inverter.db'
-        self.logger.debug(f'Database path: {dbPath}')
-
-        self.connection = sqlite3.connect(dbPath)
-        self.sql = self.connection.cursor()
-        sqlVersion = self.sql.execute('SELECT SQLITE_VERSION()')
-        self.logger.info(f'SQLite version: {sqlVersion.fetchone()}')
-        self.__initializeShema()
         self.initialRun = True
         
     def __initializeShema(self):
@@ -57,6 +47,7 @@ class InverterEnergyData:
                     self.__insertLoad(timestamp, load)
                 elif day == current_day or day == current_day - 1:
                     self.__updateLoad(timestamp, load)
+                
                 day = day - 1
 
             elif month > 0:
@@ -122,7 +113,17 @@ class InverterEnergyData:
         self.logger.debug(f'Total changes: {totalChanges}')
 
     async def __loop(self):
-        self.logger.info('Inverter energy data loop started')
+
+        script_path = abspath(dirname(__file__))
+        dbPath = f'{script_path}/inverter.db'
+        self.logger.debug(f'Database path: {dbPath}')
+
+        self.connection = sqlite3.connect(dbPath)
+        self.sql = self.connection.cursor()
+        sqlVersion = self.sql.execute('SELECT SQLITE_VERSION()')
+        self.logger.info(f'SQLite version: {sqlVersion.fetchone()}')
+        self.__initializeShema()        
+
         while self.serviceRunning:
             try:
                 self.logger.debug('Inverter energy data loop running ...')
