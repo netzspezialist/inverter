@@ -61,10 +61,7 @@ class InverterEnergyData:
                     self.connection.commit()
                     totalChanges = self.connection.total_changes
                     self.logger.debug(f'Total changes: {totalChanges}')                
-                    day = day - 1
-                else:
-                    if day == current_day:
-                        self.logger.debug(f'Energy data for day [{timestamp}] [{energyOutput}] already exists')
+                day = day - 1
             else:
                 initDaysCompleted = True
                 if current_month > 0:
