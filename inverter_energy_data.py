@@ -45,15 +45,16 @@ class InverterEnergyData:
         while not (initDaysCompleted and initMonthsCompleted and initYearsCompleted):
             timestamp = year * 10000 + month * 100 + day            
             if day > 0:
+                self.logger.debug(f'Updating energy data for day [{timestamp}]')
                 self.sql.execute(f'select * from EnergyOutput where timestamp = {timestamp}')
                 energyOutput = self.sql.fetchone()
                 load = 0
                 
-                if energyOutput is not None or day == current_day:
+                if energyOutput is None or day == current_day:
                     response = self.inverterCommands.energy('qld', str(timestamp))
                     load = response["energy"]
                     
-                if energyOutput is not None:
+                if energyOutput is None:
                     self.logger.debug(f'Insert load output [{load}] for day [{timestamp}]')
                     self.sql.execute(f'INSERT INTO EnergyOutput (timestamp, value) VALUES ({timestamp}, {load})')
                     self.connection.commit()
