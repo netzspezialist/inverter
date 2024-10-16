@@ -47,23 +47,25 @@ class InverterEnergyData:
             if day > 0:
                 self.sql.execute(f'select * from EnergyOutput where timestamp = {timestamp}')
                 energyOutput = self.sql.fetchone()
-                if energyOutput is None or day is current_day:
+                load = 0
+                
+                if energyOutput is not None or day == current_day:
                     response = self.inverterCommands.energy('qld', str(timestamp))
                     load = response["energy"]
                     
-                    if energyOutput is not None:
-                        self.sql.execute(f'INSERT INTO EnergyOutput (timestamp, value) VALUES ({timestamp}, {load})')
-                        self.logger.debug(f'Insert load output [{load}] for day [{timestamp}]')
-                    else:
-                        self.sql.execute(f'UPDATE EnergyOutput SET value = {load} WHERE timestamp = {timestamp}')
-                        self.logger.debug(f'Update load output [{load}] for day [{timestamp}]')
-
+                if energyOutput is not None:
+                    self.logger.debug(f'Insert load output [{load}] for day [{timestamp}]')
+                    self.sql.execute(f'INSERT INTO EnergyOutput (timestamp, value) VALUES ({timestamp}, {load})')
                     self.connection.commit()
-                    totalChanges = self.connection.total_changes
-                    self.logger.debug(f'Total changes: {totalChanges}')
-                    day = day - 1
-                else:
-                    day = day - 1
+                elif day == current_day:
+                    self.logger.debug(f'Update load output [{load}] for day [{timestamp}]')
+                    self.sql.execute(f'UPDATE EnergyOutput SET value = {load} WHERE timestamp = {timestamp}')
+                    self.connection.commit()
+                
+                totalChanges = self.connection.total_changes
+                self.logger.debug(f'Total changes: {totalChanges}')
+                day = day - 1
+
             else:
                 initDaysCompleted = True
                 if current_month > 0:
