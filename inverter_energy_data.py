@@ -131,9 +131,9 @@ class InverterEnergyData:
         sqlVersion = self.sql.execute('SELECT SQLITE_VERSION()')
         self.logger.info(f'SQLite version: {sqlVersion.fetchone()}')
         self.__initializeShema()
-        self.__writeEnergyData()
+        self.__writingEnergyData()
 
-        schedule.every().hour.at(":05").do(self.__writeEnergyData)
+        schedule.every().hour.at(":10").do(self.__writingEnergyData)
 
         self.__loop()
 
