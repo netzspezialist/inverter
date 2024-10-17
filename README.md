@@ -17,6 +17,7 @@ pip3 install influxdb-client
 pip3 install paho-mqtt
 pip3 install flask
 pip3 install crcmod
+pip3 install schedule
 ```
 
 ## install and start inverter service for monitoring

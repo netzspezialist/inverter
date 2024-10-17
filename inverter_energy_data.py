@@ -1,6 +1,8 @@
 import sqlite3
 import asyncio
 import datetime
+import schedule
+import time
 
 from os.path import dirname, abspath
 from logging import Logger
@@ -110,7 +112,15 @@ class InverterEnergyData:
         totalChanges = self.connection.total_changes
         self.logger.debug(f'Total changes: {totalChanges}')
 
-    async def __loop(self):
+    def __loop(self):          
+        while self.serviceRunning:
+            schedule.run_pending()
+            time.sleep(30)
+
+
+    def start(self):
+        self.logger.info('Starting energy monitoring ...')        
+        self.serviceRunning = True
 
         script_path = abspath(dirname(__file__))
         dbPath = f'{script_path}/inverter.db'
@@ -120,29 +130,12 @@ class InverterEnergyData:
         self.sql = self.connection.cursor()
         sqlVersion = self.sql.execute('SELECT SQLITE_VERSION()')
         self.logger.info(f'SQLite version: {sqlVersion.fetchone()}')
-        self.__initializeShema()        
+        self.__initializeShema()
+        self.__writeEnergyData()
 
-        while self.serviceRunning:
-            try:
-                self.logger.debug('Inverter energy data loop running ...')
-                self.__writingEnergyData()
-                await asyncio.sleep(600)
-            except Exception as e:
-                self.logger.error(f'Error in inverter energy data loop: {e}')
-            finally:
-                pass
+        schedule.every().hour.at(":05").do(self.__writeEnergyData)
 
-
-    def start(self):
-        self.logger.info('Starting energy monitoring ...')        
-        self.serviceRunning = True
-
-        loop = asyncio.new_event_loop()
-        loop.create_task(self.__loop())
-        try:
-            loop.run_forever()      
-        finally:
-            loop.close()
+        self.__loop()
 
         self.logger.info('Inverter energy monitoring stopped')
 
