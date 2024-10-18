@@ -58,7 +58,7 @@ class InverterCommands:
 
         return data
     
-    def energy(self, command, timestamp):
+    def energy(self, command: str, timestamp: int):
         self.logger.debug(f'Getting energy data [{command}{timestamp}]')
 
         command = command.upper()
@@ -86,7 +86,7 @@ class InverterCommands:
 
         return data
     
-    def updateSetting(self, setting, value):
+    def updateSetting(self, setting: str, value):
         self.logger.info(f'Updating inverter setting [{setting}] with value [{value}]')
         
         if setting == "batteryBulkVoltage":
