@@ -3,9 +3,9 @@ from inverter_energy_data import InverterEnergyData
 from inverter_mqtt import InverterMqtt
 
 class InverterRemotePanel:
-    def __init__(self, logger, inverterMqtt: InverterMqtt, inverterEnergyData: InverterEnergyData):
+    def __init__(self, logger, inverterEnergyData: InverterEnergyData):
         self.logger = logger
-        self.inverterMqtt = inverterMqtt
+        self.inverterMqtt : InverterMqtt = InverterMqtt(logger)
         self.inverterEnergyData = inverterEnergyData
 
     def __loop(self):
