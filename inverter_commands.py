@@ -80,7 +80,7 @@ class InverterCommands:
 
         timestamp = InverterResponseConverter.createTimeStamp(startTime, stopTime)
 
-        data = InverterResponseConverter.energy(command, timestamp, response)
+        data = InverterResponseConverter.energy(command, timestamp, response, self.logger)
 
         self.logger.debug(f'energy data: {data}')
 

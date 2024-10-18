@@ -76,13 +76,16 @@ class InverterResponseConverter(object):
         return data
     
     @staticmethod
-    def energy(command, timestamp, response):
+    def energy(command, timestamp, response, logger = None):
 
         energy = 0
 
         if response[1:4] != "NAK":
-            energy = int(response[2:10])        
-            energy = energy
+            try:
+                energy = int(response[2:10])    
+            except: 
+                logger.error(f'Error converting energy value: {response}')    
+                energy = 0
         
         data = { 
             "command": command, 

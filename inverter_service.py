@@ -11,6 +11,24 @@ from inverter_commands import InverterCommands
 from inverter_webapi import InverterWebAPI
 from inverter_energy_data import InverterEnergyData
 
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
+script_path = abspath(dirname(__file__))
+
+logPath = f'{script_path}/log'
+if not os.path.exists(logPath):
+    os.makedirs(logPath)
+
+fileHandler = TimedRotatingFileHandler(f'{logPath}/inverter.log', when='midnight', backupCount=7)
+fileHandler.setFormatter(logging.Formatter('%(asctime)s | %(levelname)8s | %(name)s | %(message)s'))
+logger.addHandler(fileHandler)
+
+#stdout_handler = logging.StreamHandler()
+#stdout_handler.setLevel(logging.DEBUG)
+#stdout_handler.setFormatter(logging.Formatter('%(levelname)8s | %(message)s'))
+#logger.addHandler(stdout_handler)
+
 class InverterService:
     def __init__(self, logger=None):       
         signal.signal(signal.SIGINT, self.stop) # Ctrl+C
@@ -19,22 +37,26 @@ class InverterService:
 
         self.logger = logger      
 
-        inverterConnectionLogger = logging.getLogger('inverterConnection')
+        inverterConnectionLogger = logging.getLogger('connection')
         inverterConnectionLogger.setLevel(logging.INFO)
+        inverterConnectionLogger.addHandler(fileHandler)
 
-        self.inverterConnection = InverterConnection(logger)
+        self.inverterConnection = InverterConnection(inverterConnectionLogger)
         
-        inverterCommandsLogger = logging.getLogger('inverterCommands')
+        inverterCommandsLogger = logging.getLogger('commands')
         inverterCommandsLogger.setLevel(logging.INFO)
-        self.inverterCommands: InverterCommands = InverterCommands(self.inverterConnection, logger)
+        inverterCommandsLogger.addHandler(fileHandler)
+        self.inverterCommands: InverterCommands = InverterCommands(self.inverterConnection, inverterCommandsLogger)
 
-        inverterMonitorLogger = logging.getLogger('inverterMonitor')
+        inverterMonitorLogger = logging.getLogger('monitor')
         inverterMonitorLogger.setLevel(logging.INFO)
-        self.inverterMonitor: InverterMonitor = InverterMonitor(logger, self.inverterCommands)
+        inverterMonitorLogger.addHandler(fileHandler)
+        self.inverterMonitor: InverterMonitor = InverterMonitor(inverterMonitorLogger, self.inverterCommands)
 
-        inverterEnergyDataLogger = logging.getLogger('inverterEnergyData')
+        inverterEnergyDataLogger = logging.getLogger('energyData')
         inverterEnergyDataLogger.setLevel(logging.DEBUG)
-        self.inverterEnergyData: InverterEnergyData = InverterEnergyData(logger, self.inverterCommands)
+        inverterEnergyDataLogger.addHandler(fileHandler)
+        self.inverterEnergyData: InverterEnergyData = InverterEnergyData(inverterEnergyDataLogger, self.inverterCommands)
 
         self.inverterWebAPI = InverterWebAPI(logger, self.inverterCommands)
         self.inverterWebAPIThread = Thread(target = self.inverterWebAPI.start)        
@@ -64,24 +86,6 @@ class InverterService:
 
 
 if __name__ == '__main__':
-
-    logger = logging.getLogger(__name__)
-    logger.setLevel(logging.DEBUG)
-
-    script_path = abspath(dirname(__file__))
-
-    logPath = f'{script_path}/log'
-    if not os.path.exists(logPath):
-        os.makedirs(logPath)
-
-    fileHandler = TimedRotatingFileHandler(f'{logPath}/inverter.log', when='midnight', backupCount=7)
-    fileHandler.setFormatter(logging.Formatter('%(asctime)s | %(levelname)8s | %(message)s'))
-    logger.addHandler(fileHandler)
-
-    #stdout_handler = logging.StreamHandler()
-    #stdout_handler.setLevel(logging.DEBUG)
-    #stdout_handler.setFormatter(logging.Formatter('%(levelname)8s | %(message)s'))
-    #logger.addHandler(stdout_handler)
 
     logger.info('Starting inverter service ...')
 
