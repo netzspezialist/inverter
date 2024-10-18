@@ -15,7 +15,7 @@ class InverterEnergyData:
         self.initialRun = True
         
     def __initializeShema(self):
-        self.logger.debug('Initializing schema...')
+        self.logger.info('Initializing energy data schema...')
         self.sql.execute('CREATE TABLE IF NOT EXISTS EnergyOutput (timestamp INTEGER, value INTEGER)')
         self.sql.execute('CREATE TABLE IF NOT EXISTS EnergyInput (timestamp INTEGER, value INTEGER)')
         self.connection.commit()
@@ -24,15 +24,11 @@ class InverterEnergyData:
         
 
     def __writingEnergyData(self):
-        self.logger.debug('Initializing energy data...')
+        self.logger.info('Writing energy data...')
        
         current_year = year = datetime.datetime.now().year
         current_month = month = datetime.datetime.now().month
         current_day = day = datetime.datetime.now().day
-
-        initDaysCompleted = False
-        initMonthsCompleted = False
-        initYearsCompleted = False
 
         energyFlowCommands =	{
         "Input": "qe",
@@ -41,6 +37,10 @@ class InverterEnergyData:
 
         energyFlows = ["Input", "Output"]
         for energyFlow in energyFlows:
+            initDaysCompleted = False
+            initMonthsCompleted = False
+            initYearsCompleted = False
+            
             while not (initDaysCompleted and initMonthsCompleted and initYearsCompleted):
                 timestamp = year * 10000 + month * 100 + day            
                 if day > 0:
@@ -80,7 +80,7 @@ class InverterEnergyData:
                 elif year > 2021:
                     initMonthsCompleted = True
         
-                    self.logger.debug(f'Updating energy [{energyFlow}] for year [{timestamp}]')
+                    self.logger.info(f'Updating energy [{energyFlow}] for year [{timestamp}]')
                     rowExists = self._rowExists(energyFlow, timestamp)
                     energy = 0
 

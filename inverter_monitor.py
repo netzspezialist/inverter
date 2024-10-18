@@ -49,7 +49,7 @@ class InverterMonitor:
                 data = self.inverterCommands.qpigs()
                 
                 self.influx.upload_qpigs(data["timestamp"], data)
-                self.logger.debug(f'Inverter data: {data}')
+                self.logger.info(f'Inverter data: {data}')
                 
                 data["timestamp"] = data["timestamp"].isoformat()[:-3]
                 jsonData = json.dumps(data, default=self.__serialize_datetime)
