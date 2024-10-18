@@ -39,8 +39,6 @@ class InverterRemotePanel:
         self.connection = sqlite3.connect(dbPath)
         self.sql = self.connection.cursor()
 
-        
-
         self.serviceRunning = True
         self.__loop()
 
