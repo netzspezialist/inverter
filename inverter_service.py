@@ -22,19 +22,19 @@ class InverterService:
         inverterConnectionLogger = logging.getLogger('inverterConnection')
         inverterConnectionLogger.setLevel(logging.INFO)
 
-        self.inverterConnection = InverterConnection(inverterConnectionLogger)
+        self.inverterConnection = InverterConnection(logger)
         
         inverterCommandsLogger = logging.getLogger('inverterCommands')
         inverterCommandsLogger.setLevel(logging.INFO)
-        self.inverterCommands: InverterCommands = InverterCommands(self.inverterConnection, inverterCommandsLogger)
+        self.inverterCommands: InverterCommands = InverterCommands(self.inverterConnection, logger)
 
         inverterMonitorLogger = logging.getLogger('inverterMonitor')
         inverterMonitorLogger.setLevel(logging.INFO)
-        self.inverterMonitor: InverterMonitor = InverterMonitor(inverterMonitorLogger, self.inverterCommands)
+        self.inverterMonitor: InverterMonitor = InverterMonitor(logger, self.inverterCommands)
 
         inverterEnergyDataLogger = logging.getLogger('inverterEnergyData')
         inverterEnergyDataLogger.setLevel(logging.DEBUG)
-        self.inverterEnergyData: InverterEnergyData = InverterEnergyData(inverterEnergyDataLogger, self.inverterCommands)
+        self.inverterEnergyData: InverterEnergyData = InverterEnergyData(logger, self.inverterCommands)
 
         self.inverterWebAPI = InverterWebAPI(logger, self.inverterCommands)
         self.inverterWebAPIThread = Thread(target = self.inverterWebAPI.start)        
