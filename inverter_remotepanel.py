@@ -1,47 +1,28 @@
 import time
-import paho.mqtt.client as mqtt
+from inverter_energy_data import InverterEnergyData
+from inverter_mqtt import InverterMqtt
 
-class RemotePanel:
-    def __init__(self, broker_address, topic):
-        self.broker_address = broker_address
-        self.topic = topic
-        self.client = mqtt.Client()
-        self.running = False
-        self.database = None
+class InverterRemotePanel:
+    def __init__(self, logger, inverterMqtt: InverterMqtt, inverterEnergyData: InverterEnergyData):
+        self.logger = logger
+        self.inverterMqtt = inverterMqtt
+        self.inverterEnergyData = inverterEnergyData
 
-        def connect(self):
-        self.client.connect(self.broker_address)
+    def __loop(self):
+        while self.serviceRunning:
+            try:
+                self.logger.debug('Inverter remote panel loop running ...')
+                energy = self.inverterEnergyData.getEnergy('Output', 20240000)
+                self.inverterMqtt.publish_message('energyOutput', energy)
+                time.sleep(60)
+            except Exception as e:
+                self.logger.error(f'Error in inverter remote panel loop: {e}')
 
-        def send_data(self, data):
-        self.client.publish(self.topic, data)
-
-        def start_loop(self, data_generator, interval):
+    def start(self):
+        self.logger.info('Starting remote panel ...')
         self.running = True
-        try:
-            while self.running:
-            data = data_generator(self.database)
-            self.send_data(data)
-            time.sleep(interval)
-        except KeyboardInterrupt:
-            print("Stopping periodic data sending.")
+        self.__loop()
 
-        def stop_loop(self):
+    def stop(self):
+        self.logger.info('Stopping remote panel ...')
         self.running = False
-
-        def disconnect(self):
-        self.client.disconnect()
-
-        def set_database(self, database):
-        self.database = database
-
-    # Example usage:
-    # def generate_data(database):
-    #     # Replace with your data generation logic from the database
-    #     return database.get_data()
-    #
-    # panel = RemotePanel("broker.hivemq.com", "inverter/data")
-    # panel.set_database(your_database_instance)  # Set your NoSQL database instance here
-    # panel.connect()
-    # panel.start_loop(generate_data, 5)  # Sends data every 5 seconds
-    # panel.stop_loop()
-    # panel.disconnect()
