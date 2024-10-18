@@ -11,9 +11,9 @@ class InverterRemotePanel:
     def __loop(self):
         while self.serviceRunning:
             try:
-                self.logger.debug('Inverter remote panel loop running ...')
-                energy = self.inverterEnergyData.getEnergy('Output', 20240000)
-                self.inverterMqtt.publish_message('energyOutput', energy)
+                #self.logger.debug('Inverter remote panel loop running ...')
+                #energy = self.inverterEnergyData.getEnergy('Output', 20240000)
+                #self.inverterMqtt.publish_message('energyOutput', energy)
                 time.sleep(60)
             except Exception as e:
                 self.logger.error(f'Error in inverter remote panel loop: {e}')
