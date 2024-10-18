@@ -82,8 +82,8 @@ class InverterService:
         self.inverterEnergyDataThread = Thread(target = self.inverterEnergyData.start)
         self.inverterEnergyDataThread.start()
         
-        self.inverterMqtt.connect()
-        self.inverterRemotePanel.start()
+        #self.inverterMqtt.connect()
+        #self.inverterRemotePanel.start()
 
         
         self.logger.info('Starting inverter web API ...')    
