@@ -26,17 +26,21 @@ class InverterEnergyData:
     def __writingEnergyData(self):
         self.logger.info('Writing energy data...')
        
-        current_year = year = datetime.datetime.now().year
-        current_month = month = datetime.datetime.now().month
-        current_day = day = datetime.datetime.now().day
-
         energyFlowCommands =	{
         "Input": "qe",
         "Output": "ql"
         }
 
+        current_year =  datetime.datetime.now().year
+        current_month = datetime.datetime.now().month
+        current_day = datetime.datetime.now().day
+
         energyFlows = ["Input", "Output"]
         for energyFlow in energyFlows:
+            year = current_year
+            month = current_month
+            day = current_day
+            
             initDaysCompleted = False
             initMonthsCompleted = False
             initYearsCompleted = False
