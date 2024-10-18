@@ -20,9 +20,9 @@ class InverterRemotePanel:
 
     def start(self):
         self.logger.info('Starting remote panel ...')
-        self.running = True
+        self.serviceRunning = True
         self.__loop()
 
     def stop(self):
         self.logger.info('Stopping remote panel ...')
-        self.running = False
+        self.serviceRunning = False
