@@ -22,7 +22,7 @@ class InverterConnection:
     def __open(self):
         try:
             if self.connectionType == 'serial':
-                self.logger.info('Opening inverter connection serial port')    
+                self.logger.debug('Opening inverter connection serial port')    
                 self.ser = serial.Serial()
                 self.ser.port = self.port                
                 self.ser.baudrate = 2400
@@ -37,10 +37,10 @@ class InverterConnection:
 
                 self.ser.open()
             else:
-                self.logger.info('Opening inverter connection USB port')    
+                self.logger.debug('Opening inverter connection USB port')    
                 self.usb.port = os.open(self.usb.port, os.O_RDWR | os.O_NONBLOCK)
 
-            self.logger.info('Inverter connection opened')
+            self.logger.debug('Inverter connection opened')
         except Exception as e:
             self.logger.error(f"error open USB port: {e}")
 
@@ -51,7 +51,7 @@ class InverterConnection:
         else:
             os.close(self.port)
         self.connected = False
-        self.logger.info('Inverter connection closed')
+        self.logger.debug('Inverter connection closed')
 
     def __send_command(self, command):
         encoded_cmd = command.encode('ascii')

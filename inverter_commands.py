@@ -25,12 +25,12 @@ class InverterCommands:
         self.logger = logger
 
     def qpigs(self):
-        #self.logger.debug('Getting qpigs...')
+        self.logger.debug('Getting qpigs...')
         startTime = datetime.now()        
         response1 = self.inverterConnection.execute("QPIGS")
-        #self.logger.debug(f'qpigs result: {response1}')
+        self.logger.debug(f'qpigs result: {response1}')
         response2 = self.inverterConnection.execute("QPIGS2")
-        #self.logger.debug(f'qpigs result: {response2}')
+        self.logger.debug(f'qpigs result: {response2}')
         stopTime = datetime.now()
 
         command = "qpigs"

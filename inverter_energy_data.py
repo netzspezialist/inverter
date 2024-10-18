@@ -95,8 +95,10 @@ class InverterEnergyData:
 
                     year = year - 1
                 else:
-                    initYearsCompleted = True            
+                    initYearsCompleted = True
+                    self.logger.info(f'Updating energy [{energyFlow}] done')
 
+        self.logger.info(f'Updating energy done')
         self.initialRun = True
 
 
