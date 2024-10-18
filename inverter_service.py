@@ -68,7 +68,7 @@ class InverterService:
         self.inverterRemotePanelLogger = logging.getLogger('remotePanel')
         self.inverterRemotePanelLogger.setLevel(logging.DEBUG)
         self.inverterRemotePanelLogger.addHandler(fileHandler)
-        self.inverterRemotePanel = InverterRemotePanel(self.inverterRemotePanelLogger)
+        #self.inverterRemotePanel = InverterRemotePanel(self.inverterRemotePanelLogger)
 
         self.inverterWebAPI = InverterWebAPI(logger, self.inverterCommands)
         self.inverterWebAPIThread = Thread(target = self.inverterWebAPI.start)        

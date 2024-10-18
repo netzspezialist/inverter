@@ -110,7 +110,6 @@ class InverterEnergyData:
         self.logger.debug(f'Checking if row exists for Energy{direction} timestamp [{timestamp}]')
         self.sql.execute(f'select * from Energy{direction} where timestamp = {timestamp}')
         energy = self.sql.fetchone()
-        self.connection.commit()
         return energy is not None
 
     def __insertRow(self, direction: str, timestamp: int, energy: int):
