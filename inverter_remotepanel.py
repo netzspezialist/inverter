@@ -1,3 +1,4 @@
+import json
 from os.path import abspath, dirname
 import sqlite3
 import time
@@ -20,7 +21,11 @@ class InverterRemotePanel:
             try:
                 self.logger.debug('Inverter remote panel loop running ...')
                 energy = self.__getEnergy('Output', 20240000)
-                self.inverterMqtt.publish_message('energyOutput', energy)
+                data =  {
+                    "energy": energy
+                }
+                jsonData = json.dumps(data)
+                self.inverterMqtt.publish_message('energyOutput', jsonData)
                 time.sleep(60)
             except Exception as e:
                 self.logger.error(f'Error in inverter remote panel loop: {e}')
