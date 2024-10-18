@@ -151,14 +151,10 @@ class InverterEnergyData:
 
         self.__loop()
 
+        self.connection.close()
+
         self.logger.info('Inverter energy monitoring stopped')
 
     def stop(self):
         self.logger.info('Stopping energy monitoring ...')
         self.serviceRunning = False               
-    
-    def getEnergy(self, direction: str, timestamp: int):
-        self.logger.debug(f'Getting energy data [{direction}] from [{timestamp}]')
-        self.sql.execute(f'SELECT * FROM Energy{direction} WHERE timestamp = {timestamp}')
-        energy = self.sql.fetchone()
-        return energy
