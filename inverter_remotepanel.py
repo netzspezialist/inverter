@@ -14,7 +14,7 @@ class InverterRemotePanel:
         self.logger.debug(f'Getting energy data [{direction}] from [{timestamp}]')
         self.sql.execute(f'SELECT * FROM Energy{direction} WHERE timestamp = {timestamp}')
         energy = self.sql.fetchone()
-        self.sql.commit()
+        self.connection.commit()
         return energy
 
     def __loop(self):
