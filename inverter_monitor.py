@@ -11,7 +11,7 @@ class InverterMonitor:
         self.logger = logger
         self.influx = InverterInflux(logger)
         self.inverterCommands = inverterCommands
-        self.mqtt = InverterMqtt(logger)
+        #self.mqtt = InverterMqtt(logger)
         self.last_execution_date = None  # Initialize last execution date    
 
     async def __loop(self):
@@ -54,15 +54,15 @@ class InverterMonitor:
                 data["timestamp"] = data["timestamp"].isoformat()[:-3]
                 jsonData = json.dumps(data, default=self.__serialize_datetime)
                 
-                self.logger.debug(f'Publishing to MQTT: {jsonData}')
-                self.mqtt.publish_message("qpigs", jsonData)
+                #self.logger.debug(f'Publishing to MQTT: {jsonData}')
+                #self.mqtt.publish_message("qpigs", jsonData)
                 
                 await asyncio.sleep(2)
             except Exception as e:
                 self.logger.error(f'Inverter monitor loop failed: {e}')
                 await asyncio.sleep(10)
 
-        self.mqtt.disconnect()
+        #self.mqtt.disconnect()
         self.logger.info('Inverter monitor loop stopped')
 
     def __serialize_datetime(obj): 
@@ -72,7 +72,7 @@ class InverterMonitor:
   
     def start(self):
         self.logger.info('Starting inverter monitoring ...')        
-        self.mqtt.connect()
+        #self.mqtt.connect()
         self.serviceRunning = True
 
         loop = asyncio.new_event_loop()
