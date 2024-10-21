@@ -88,9 +88,11 @@ class InverterService:
         self.logger.info('Starting inverter web API ...')    
         self.inverterWebAPIThread.start()
         self.logger.info('Inverter web API started ...')    
-        self.inverterMonitorThread.join()
-        
 
+        self.inverterMonitorThread.join()
+        self.inverterEnergyDataThread.join()
+        self.inverterRemotePanelThread.join()
+            
         self.logger.info('Exit inverter service ...')
 
 
