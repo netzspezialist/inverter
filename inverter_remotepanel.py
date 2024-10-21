@@ -37,6 +37,7 @@ class InverterRemotePanel:
 
         script_path = abspath(dirname(__file__))
         dbPath = f'{script_path}/inverter.db?mode=ro'
+        self.logger.debug(f'Database path: {dbPath}')
         self.connection = sqlite3.connect(dbPath)
         self.sql = self.connection.cursor()
 
