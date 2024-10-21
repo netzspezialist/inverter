@@ -13,7 +13,7 @@ class InverterMqtt:
   
         self.topic = mqttConfig["topic"]
         self.enabled = mqttConfig["enabled"]
-        self.not_connected = False
+        self.connected = False
 
     def connect(self):
         if not self.enabled:
@@ -22,7 +22,7 @@ class InverterMqtt:
         def on_connect(client, userdata, flags, rc, properties):
             if rc == 0:
                 self.logger.info("Connected to MQTT Broker!")
-                self.not_connected = True
+                self.connected = True
             else:
                 self.logger.error(f"Failed to connect, return code [{rc}]")
 
@@ -36,7 +36,7 @@ class InverterMqtt:
         self.client.loop_start()
 
     def publish_message(self, command, data):
-        if not self.enabled or self.not_connected:
+        if not self.enabled or not self.connected:
             return
         topic = f"{self.topic}/{command}"
         self.logger.debug(f'Publishing to [{topic}] data [{data}]')
@@ -46,6 +46,6 @@ class InverterMqtt:
         if not self.enabled:
             return
         self.logger.info('Disconnecting from MQTT broker')
-        self.not_connected = False
+        self.connected = False
         self.client.loop_stop()
         self.client.disconnect()
