@@ -21,7 +21,7 @@ class InverterRemotePanel:
             years += f', {timestamp}'
             year += 1
 
-        self.logger.debug(f'Getting total [Energy{direction}] for years: [{years}]')            
+        self.logger.debug(f'Getting [Energy{direction}] for years: [{years}]')            
             
         self.sql.execute(f'select sum(value) from Energy{direction} where timestamp in ( {years} )')
         energy = self.sql.fetchone()
@@ -36,6 +36,20 @@ class InverterRemotePanel:
         self.sql.execute(f'select value from Energy{direction} where timestamp = {timestamp}')
         energy = self.sql.fetchone()
         return energy[0] if energy is not None else 0
+
+    def __getEnergyLastDays(self, direction: str, days: int):
+        currentDay = datetime.datetime.now() -datetime.timedelta(days=1)
+        timestamp = currentDay.year * 10000 + currentDay.month * 100 + currentDay.day      
+        timestamps = f'{timestamp}'
+
+        for i in range(1, days):
+            currentDay = currentDay - datetime.timedelta(days=1)
+            timestamp = currentDay.year * 10000 + currentDay.month * 100 + currentDay.day
+            timestamps += f', {timestamp}'
+
+        self.sql.execute(f'select sum(value) from Energy{direction} where timestamp in ( {timestamps} )')
+        energy = self.sql.fetchone()
+        return energy[0] if energy is not None else 0        
     
     
     def __getEnergyLast12Months(self, direction: str):
@@ -50,7 +64,7 @@ class InverterRemotePanel:
         timestamp = year * 10000 + month * 100
         timestamps = f'{timestamp}'
 
-        for i in range(1, 11):
+        for i in range(1, 12):
             
             month = month - 1
 
@@ -61,7 +75,7 @@ class InverterRemotePanel:
             timestamp = year * 10000 + month * 100
             timestamps += f', {timestamp}'
         
-        self.logger.debug(f'Getting total [Energy{direction}] for last 12 months [{timestamps}]')
+        self.logger.debug(f'Getting [Energy{direction}] for last 12 months [{timestamps}]')
         self.sql.execute(f'select sum(value) from Energy{direction} where timestamp in ( {timestamps} )')
         energy = self.sql.fetchone()
         return energy[0] if energy is not None else 0
@@ -72,11 +86,15 @@ class InverterRemotePanel:
                 self.logger.debug('Inverter remote panel loop running ...')
                 energyTotal = self.__getEnergyToatal('Output')
                 energyLast12Months = self.__getEnergyLast12Months('Output')
+                energyLast30Days = self.__getEnergyLastDays('Output', 30)
+                energyLast7Days = self.__getEnergyLastDays('Output', 7)
                 energyYesterday = self.__getEnergyDay('Output', True)
                 energyToday = self.__getEnergyDay('Output', False)
                 data =  {
                     "total": energyTotal,
                     "last12Months": energyLast12Months,
+                    "last30Days": energyLast30Days,
+                    "last7Days": energyLast7Days,
                     "yesterday": energyYesterday,
                     "today": energyToday
                 }
