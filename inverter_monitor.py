@@ -49,12 +49,12 @@ class InverterMonitor:
                 data = self.inverterCommands.qpigs()
                 
                 self.influx.upload_qpigs(data["timestamp"], data)
-                self.logger.info(f'Inverter data: {data}')
+                self.logger.debu(f'Inverter data: {data}')
                 
                 data["timestamp"] = data["timestamp"].isoformat()[:-3]
                 jsonData = json.dumps(data, default=self.__serialize_datetime)
                 
-                self.logger.debug(f'Publishing to MQTT: {jsonData}')
+                self.logger.info(f'Publishing to MQTT: {jsonData}')
                 self.mqtt.publish_message("qpigs", jsonData)
                 
                 await asyncio.sleep(2)
