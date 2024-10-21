@@ -12,7 +12,7 @@ class InverterRemotePanel:
     
     def __getEnergy(self, direction: str, timestamp: int):
         self.logger.debug(f'Getting energy data [{direction}] from [{timestamp}]')
-        self.sql.execute(f'SELECT * FROM Energy{direction} WHERE timestamp = {timestamp}')
+        self.sql.execute(f'select * from Energy{direction} where timestamp = {timestamp}')
         energy = self.sql.fetchone()
         self.connection.commit()
         return energy
@@ -30,6 +30,7 @@ class InverterRemotePanel:
                 time.sleep(60)
             except Exception as e:
                 self.logger.error(f'Error in inverter remote panel loop: {e}')
+                time.sleep(60)
 
     def start(self):
         self.logger.info('Starting remote panel ...')
