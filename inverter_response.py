@@ -15,10 +15,13 @@ class InverterResponseConverter(object):
         else:
             batteryCurrent = batteryChargingCurrent
 
+        batteryStateOfCharge = int(response1[51:54])
+
         outputLoadPercent = int(response1[33:36])
         outputApparentPower = int(response1[23:27])
         outputActivePower = int(response1[28:32])
         
+        temperature = int(response1[55:59])
         inputCurrent1 = float(response1[60:64])
         inputVoltage1 = float(response1[65:70])        
         inputPower1 = int(response1[98:103])        
@@ -33,12 +36,13 @@ class InverterResponseConverter(object):
 
 
 
-        temperature = int(response1[55:59])
+        
 
         data =  {
             "command": command,
             "timestamp": timestamp,#timestamp.strftime('%Y-%m-%dT%H:%M:%S.%fZ'), # "2021-09-29T19:00:00.000",
             "batteryVoltage": batteryVoltage,
+            "batteryStateOfCharge": batteryStateOfCharge,
             "batteryCurrent": batteryCurrent,
             "outputLoadPercent": outputLoadPercent,
             "outputApparentPower": outputApparentPower,
