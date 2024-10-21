@@ -43,13 +43,16 @@ class InverterRemotePanel:
                 self.logger.debug('Inverter remote panel loop running ...')
                 energyTotal = self.__getEnergyToatal('Output')
                 energyYesterday = self.__getEnergyDay('Output', True)
-                energyToday = self.inverterEnergyData.__getEnergyDay('Output', False)
+                energyToday = self.__getEnergyDay('Output', False)
                 data =  {
                     "total": energyTotal,
                     "yesterday": energyYesterday,
                     "today": energyToday
                 }
                 jsonData = json.dumps(data)
+
+                self.logger.debug(f'Publishing energyOutput: {jsonData}')
+
                 self.inverterMqtt.publish_message('energyOutput', jsonData)
                 time.sleep(60)
             except Exception as e:
