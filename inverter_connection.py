@@ -94,6 +94,8 @@ class InverterConnection:
                 responseBytes += r
                 if  b'\r' in responseBytes:
                     lastResponse = True
+                if b'' in responseBytes:
+                    return None
 
             self.logger.debug(f'Inverter response [{responseBytes}]')     
             responseBytes = responseBytes[:responseBytes.index(b'\r') - 2]
@@ -117,6 +119,7 @@ class InverterConnection:
             self.__close()
 
             if response is None:
+                self.logger.error('No response from inverter')
                 raise ConnectionError('No response from inverter')
 
             self.logger.debug(f'Inverter execute response [{response}]')
