@@ -26,14 +26,28 @@ class InverterRemotePanel:
         self.sql.execute(f'select sum(value) from Energy{direction} where timestamp in ( {years} )')
         energy = self.sql.fetchone()
         return energy
+    
+    def __getEnergyDay(self, direction: str, yesterday: bool):
+        timestamp = datetime.datetime.now()
+        if yesterday:
+            timestamp = timestamp - datetime.timedelta(days=1)
+        timestamp = timestamp.strftime('%Y%m%d')
+        self.logger.debug(f'Getting total [Energy{direction}] for yesterday: [{timestamp}]')
+        self.sql.execute(f'select value from Energy{direction} where timestamp = {timestamp}')
+        energy = self.sql.fetchone()
+        return energy
 
     def __loop(self):
         while self.serviceRunning:
             try:
                 self.logger.debug('Inverter remote panel loop running ...')
-                energy = self.__getEnergyToatal('Output')
+                energyTotal = self.__getEnergyToatal('Output')
+                energyYesterday = self.__getEnergyDay('Output', True)
+                energyToday = self.inverterEnergyData.__getEnergyDay('Output', False)
                 data =  {
-                    "energy": energy
+                    "total": energyTotal,
+                    "yesterday": energyYesterday,
+                    "today": energyToday
                 }
                 jsonData = json.dumps(data)
                 self.inverterMqtt.publish_message('energyOutput', jsonData)

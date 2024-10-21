@@ -84,7 +84,7 @@ class InverterEnergyData:
                 elif year > 2021:
                     initMonthsCompleted = True
         
-                    self.logger.info(f'Updating energy [{energyFlow}] for year [{timestamp}]')
+                    self.logger.debug(f'Updating energy [{energyFlow}] for year [{timestamp}]')
                     rowExists = self._rowExists(energyFlow, timestamp)
                     energy = 0
 
