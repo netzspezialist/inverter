@@ -75,12 +75,16 @@ class InverterService:
         self.inverterWebAPI = InverterWebAPI(logger, self.inverterCommands)
         self.inverterWebAPIThread = Thread(target = self.inverterWebAPI.start)        
 
+    async def startAsyncTasks(self):
+        inverterMonitorTask = asyncio.create_task(
+            self.inverterMonitor.start())
+
+        await inverterMonitorTask
+
     def start(self):
         self.logger.info('Starting inverter service ...')
 
-        InverterMonitorTask = self.inverterMonitor.start()
-        allTasksCompleted = False
-
+        asyncio.run(self.startAsyncTasks())
 
         #self.inverterMonitorThread = Thread(target = self.inverterMonitor.start)
         #self.inverterMonitorThread.start()
@@ -101,7 +105,7 @@ class InverterService:
         self.inverterMonitorThread.join()
 
         while not allTasksCompleted:
-            allTasksCompleted = InverterMonitorTask.isDone()
+            allTasksCompleted = inverterMonitorTask.isDone()
             time.sleep(1)
         
 
