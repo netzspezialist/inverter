@@ -23,7 +23,7 @@ class InverterRemotePanel:
 
         self.logger.debug(f'Getting total [Energy{direction}] for years: [{years}]')            
             
-        self.sql.execute(f'select sum(value) from Energy{direction} where timestamp = timestamp in ( {years} )')
+        self.sql.execute(f'select sum(value) from Energy{direction} where timestamp in ( {years} )')
         energy = self.sql.fetchone()
         return energy
 
