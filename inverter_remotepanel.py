@@ -39,13 +39,26 @@ class InverterRemotePanel:
     
     
     def __getEnergyLast12Months(self, direction: str):
-        date = datetime.datetime.now() - datetime.timedelta(months=1)
-        timestamp = date.year * 10000 + date.month * 100
+
+        year = datetime.datetime.now().year
+        month = datetime.datetime.now().month - 1
+
+        if month == 0:
+            month = 12
+            year -= 1
+       
+        timestamp = year * 10000 + month * 100
         timestamps = f'{timestamp}'
 
         for i in range(1, 11):
-            date = date - datetime.timedelta(months=i)
-            timestamp = date.year * 10000 + date.month * 100
+            
+            month = month - 1
+
+            if month == 0:
+                month = 12
+                year -= 1
+
+            timestamp = year * 10000 + month * 100
             timestamps += f', {timestamp}'
         
         self.logger.debug(f'Getting total [Energy{direction}] for last 12 months [{timestamps}]')
