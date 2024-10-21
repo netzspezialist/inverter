@@ -25,7 +25,7 @@ class InverterRemotePanel:
             
         self.sql.execute(f'select sum(value) from Energy{direction} where timestamp in ( {years} )')
         energy = self.sql.fetchone()
-        return energy
+        return energy[0] if energy is not None else 0
     
     def __getEnergyDay(self, direction: str, yesterday: bool):
         timestamp = datetime.datetime.now()
@@ -35,7 +35,7 @@ class InverterRemotePanel:
         self.logger.debug(f'Getting total [Energy{direction}] for yesterday: [{timestamp}]')
         self.sql.execute(f'select value from Energy{direction} where timestamp = {timestamp}')
         energy = self.sql.fetchone()
-        return energy
+        return energy[0] if energy is not None else 0
 
     def __loop(self):
         while self.serviceRunning:
