@@ -70,23 +70,21 @@ class InverterMonitor:
             return obj.isoformat() 
         raise TypeError("Type not serializable") 
   
-    async def start(self):
+    def start(self):
         self.logger.info('Starting inverter monitoring ...')        
         #self.mqtt.connect()
         self.serviceRunning = True
 
-        await self.__loop()
-
-        #loop = asyncio.new_event_loop()
-        #loop.create_task(self.__loop())
-        #try:
-        #    loop.run_forever()      
-        #finally:
-        #    loop.close()
+        loop = asyncio.new_event_loop()
+        loop.create_task(self.__loop())
+        try:
+            loop.run_forever()      
+        finally:
+            loop.close()
 
         self.logger.info('Inverter monitoring stopped')
 
-    async def stop(self):
+    def stop(self):
         self.logger.info('Stopping inverter monitoring ...')
         self.serviceRunning = False   
   

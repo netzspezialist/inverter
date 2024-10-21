@@ -1,4 +1,3 @@
-import asyncio
 import logging
 from logging.handlers import TimedRotatingFileHandler
 import os
@@ -6,7 +5,6 @@ import signal
 import sys
 from threading import Thread
 from os.path import dirname, abspath
-import time
 from inverter_connection import InverterConnection
 from inverter_monitor import InverterMonitor
 from inverter_commands import InverterCommands
@@ -75,19 +73,11 @@ class InverterService:
         self.inverterWebAPI = InverterWebAPI(logger, self.inverterCommands)
         self.inverterWebAPIThread = Thread(target = self.inverterWebAPI.start)        
 
-    async def startAsyncTasks(self):
-        inverterMonitorTask = asyncio.create_task(
-            self.inverterMonitor.start())
-
-        await inverterMonitorTask
-
     def start(self):
         self.logger.info('Starting inverter service ...')
 
-        asyncio.run(self.startAsyncTasks())
-
-        #self.inverterMonitorThread = Thread(target = self.inverterMonitor.start)
-        #self.inverterMonitorThread.start()
+        self.inverterMonitorThread = Thread(target = self.inverterMonitor.start)
+        self.inverterMonitorThread.start()
 
         self.inverterEnergyDataThread = Thread(target = self.inverterEnergyData.start)
         self.inverterEnergyDataThread.start()
@@ -103,10 +93,6 @@ class InverterService:
         self.inverterWebAPIThread.start()
         self.logger.info('Inverter web API started ...')    
         self.inverterMonitorThread.join()
-
-        while not allTasksCompleted:
-            allTasksCompleted = inverterMonitorTask.isDone()
-            time.sleep(1)
         
 
         self.logger.info('Exit inverter service ...')
