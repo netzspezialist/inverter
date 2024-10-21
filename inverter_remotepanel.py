@@ -47,6 +47,8 @@ class InverterRemotePanel:
             timestamp = currentDay.year * 10000 + currentDay.month * 100 + currentDay.day
             timestamps += f', {timestamp}'
 
+        self.logger.debug(f'Getting [Energy{direction}] for last [{days}] days: [{timestamps}]')
+
         self.sql.execute(f'select sum(value) from Energy{direction} where timestamp in ( {timestamps} )')
         energy = self.sql.fetchone()
         return energy[0] if energy is not None else 0        
@@ -96,7 +98,8 @@ class InverterRemotePanel:
                     "last30Days": energyLast30Days,
                     "last7Days": energyLast7Days,
                     "yesterday": energyYesterday,
-                    "today": energyToday
+                    "today": energyToday,
+                    "timestamp": datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 }
                 jsonData = json.dumps(data)
 
