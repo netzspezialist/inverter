@@ -15,6 +15,7 @@ class InverterRemotePanel:
         currentYear = datetime.datetime.now().year
         
         years = '20220000'
+        year = 2023
         while year <= currentYear:
             timestamp = year * 10000
             years += f', {timestamp}'
