@@ -39,16 +39,17 @@ class InverterRemotePanel:
     
     
     def __getEnergyLast12Months(self, direction: str):
-        lastMonth = datetime.datetime.now().month - 1
-        timestamp = datetime.datetime.now().year * 10000 + lastMonth * 100
-        months = f'{timestamp}'
+        date = datetime.datetime.now() - datetime.timedelta(months=1)
+        timestamp = date.year * 10000 + date.month * 100
+        timestamps = f'{timestamp}'
 
-        for i in range(1, 12):
-            timestamp = timestamp - 100
-            months += f', {timestamp}'
+        for i in range(1, 11):
+            date = date - datetime.timedelta(months=i)
+            timestamp = date.year * 10000 + date.month * 100
+            timestamps += f', {timestamp}'
         
-        self.logger.debug(f'Getting total [Energy{direction}] for last 12 months [{months}]')
-        self.sql.execute(f'select sum(value) from Energy{direction} where timestamp in ( {months} )')
+        self.logger.debug(f'Getting total [Energy{direction}] for last 12 months [{timestamps}]')
+        self.sql.execute(f'select sum(value) from Energy{direction} where timestamp in ( {timestamps} )')
         energy = self.sql.fetchone()
         return energy[0] if energy is not None else 0
 
