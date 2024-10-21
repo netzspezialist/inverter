@@ -94,7 +94,7 @@ class InverterConnection:
                 responseBytes += r
                 if  b'\r' in responseBytes:
                     lastResponse = True
-                if b'' in responseBytes:
+                if len(r) == 0:
                     return None
 
             self.logger.debug(f'Inverter response [{responseBytes}]')     
