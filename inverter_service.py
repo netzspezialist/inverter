@@ -68,7 +68,7 @@ class InverterService:
         self.inverterRemotePanelLogger = logging.getLogger('remotePanel')
         self.inverterRemotePanelLogger.setLevel(logging.DEBUG)
         self.inverterRemotePanelLogger.addHandler(fileHandler)
-        #self.inverterRemotePanel = InverterRemotePanel(self.inverterRemotePanelLogger)
+        self.inverterRemotePanel = InverterRemotePanel(self.inverterRemotePanelLogger)
 
         self.inverterWebAPI = InverterWebAPI(logger, self.inverterCommands)
         self.inverterWebAPIThread = Thread(target = self.inverterWebAPI.start)        
@@ -82,12 +82,8 @@ class InverterService:
         self.inverterEnergyDataThread = Thread(target = self.inverterEnergyData.start)
         self.inverterEnergyDataThread.start()
         
-        # self.inverterMqtt.connect()        
-        # self.inverterRemotePanel.start()
-
-        #self.inverterRemotePanelThread = Thread(target = self.inverterRemotePanel.start)
-        #self.inverterRemotePanelThread.start()
-
+        self.inverterRemotePanelThread = Thread(target = self.inverterRemotePanel.start)
+        self.inverterRemotePanelThread.start()
         
         self.logger.info('Starting inverter web API ...')    
         self.inverterWebAPIThread.start()
