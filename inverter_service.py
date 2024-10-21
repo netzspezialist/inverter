@@ -98,9 +98,9 @@ class InverterService:
         self.logger.info('Stopping inverter service ...')
         self.inverterMonitor.stop()
         self.inverterEnergyData.stop()
-        #self.inverterRemotePanel.stop()
+        self.inverterRemotePanel.stop()
 
-        self.inverterMqtt.disconnect()
+        #self.inverterMqtt.disconnect()
 
 
 if __name__ == '__main__':

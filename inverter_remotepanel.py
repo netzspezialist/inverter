@@ -132,7 +132,6 @@ class InverterRemotePanel:
         self.sql = self.connection.cursor()
 
         self.serviceRunning = True
-
         schedule.every().hour.at(":01").do(self.__updateEnergyOutput)
 
         self.__loop()
