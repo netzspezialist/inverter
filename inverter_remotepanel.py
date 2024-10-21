@@ -110,6 +110,7 @@ class InverterRemotePanel:
 
     def start(self):
         self.logger.info('Starting remote panel ...')
+        self.inverterMqtt.connect()
 
         script_path = abspath(dirname(__file__))
         dbPath = f'{script_path}/inverter.db'
