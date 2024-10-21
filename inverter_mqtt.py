@@ -49,3 +49,6 @@ class InverterMqtt:
         self.connected = False
         self.client.loop_stop()
         self.client.disconnect()
+
+    def isConected(self):
+        return self.connected

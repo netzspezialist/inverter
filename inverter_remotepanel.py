@@ -3,6 +3,7 @@ import json
 from os.path import abspath, dirname
 import sqlite3
 import time
+import schedule
 from inverter_energy_data import InverterEnergyData
 from inverter_mqtt import InverterMqtt
 
@@ -82,34 +83,43 @@ class InverterRemotePanel:
         energy = self.sql.fetchone()
         return energy[0] if energy is not None else 0
 
-    def __loop(self):
+    def __updateEnergyOutput(self):
+        try:
+            self.logger.debug('Inverter remote panel loop running ...')
+            energyTotal = self.__getEnergyToatal('Output')
+            energyLast12Months = self.__getEnergyLast12Months('Output')
+            energyLast30Days = self.__getEnergyLastDays('Output', 30)
+            energyLast7Days = self.__getEnergyLastDays('Output', 7)
+            energyYesterday = self.__getEnergyDay('Output', True)
+            energyToday = self.__getEnergyDay('Output', False)
+            data =  {
+                "total": energyTotal,
+                "last12Months": energyLast12Months,
+                "last30Days": energyLast30Days,
+                "last7Days": energyLast7Days,
+                "yesterday": energyYesterday,
+                "today": energyToday,
+                "timestamp": datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            }
+            jsonData = json.dumps(data)
+
+            self.logger.info(f'Publishing energyOutput: {jsonData}')
+
+            self.inverterMqtt.publish_message('energyOutput', jsonData)
+        except Exception as e:
+            self.logger.error(f'Error in inverter remote panel loop: {e}')
+
+
+    def __loop(self):          
+        initalRun = False
+        
         while self.serviceRunning:
-            try:
-                self.logger.debug('Inverter remote panel loop running ...')
-                energyTotal = self.__getEnergyToatal('Output')
-                energyLast12Months = self.__getEnergyLast12Months('Output')
-                energyLast30Days = self.__getEnergyLastDays('Output', 30)
-                energyLast7Days = self.__getEnergyLastDays('Output', 7)
-                energyYesterday = self.__getEnergyDay('Output', True)
-                energyToday = self.__getEnergyDay('Output', False)
-                data =  {
-                    "total": energyTotal,
-                    "last12Months": energyLast12Months,
-                    "last30Days": energyLast30Days,
-                    "last7Days": energyLast7Days,
-                    "yesterday": energyYesterday,
-                    "today": energyToday,
-                    "timestamp": datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                }
-                jsonData = json.dumps(data)
+            schedule.run_pending()
+            time.sleep(10)
 
-                self.logger.debug(f'Publishing energyOutput: {jsonData}')
-
-                self.inverterMqtt.publish_message('energyOutput', jsonData)
-                time.sleep(60)
-            except Exception as e:
-                self.logger.error(f'Error in inverter remote panel loop: {e}')
-                time.sleep(60)
+            if initalRun is False and self.inverterMqtt.isConected() is True:
+                self.__updateEnergyOutput()
+                initalRun = True
 
     def start(self):
         self.logger.info('Starting remote panel ...')
@@ -122,6 +132,9 @@ class InverterRemotePanel:
         self.sql = self.connection.cursor()
 
         self.serviceRunning = True
+
+        schedule.every().hour.at(":01").do(self.__updateEnergyOutput)
+
         self.__loop()
 
         self.connection.close()
