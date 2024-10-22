@@ -99,9 +99,9 @@ class InverterRemotePanel:
                 "last7Days": energyLast7Days,
                 "yesterday": energyYesterday,
                 "today": energyToday,
-                "timestamp": datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                "timestamp": datetime.datetime.now().isoformat()[:-3]
             }
-            jsonData = json.dumps(data)
+            jsonData = json.dumps(data, default=self.__serialize_datetime)
 
             self.logger.info(f'Publishing energyOutput: {jsonData}')
 
@@ -109,6 +109,10 @@ class InverterRemotePanel:
         except Exception as e:
             self.logger.error(f'Error in inverter remote panel loop: {e}')
 
+    def __serialize_datetime(obj): 
+        if isinstance(obj, datetime.datetime): 
+            return obj.isoformat() 
+        raise TypeError("Type not serializable") 
 
     def __loop(self):          
         initalRun = False
