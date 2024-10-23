@@ -59,12 +59,7 @@ class InverterService:
         inverterEnergyDataLogger.setLevel(logging.INFO)
         inverterEnergyDataLogger.addHandler(fileHandler)
         self.inverterEnergyData: InverterEnergyData = InverterEnergyData(inverterEnergyDataLogger, self.inverterCommands)
-
-        #inverterMqttLogger = logging.getLogger('mqtt')
-        #inverterMqttLogger.setLevel(logging.DEBUG)
-        #inverterMqttLogger.addHandler(fileHandler)
-        #self.inverterMqtt : InverterMqtt = InverterMqtt(inverterMqttLogger)
-        
+       
         self.inverterRemotePanelLogger = logging.getLogger('remotePanel')
         self.inverterRemotePanelLogger.setLevel(logging.DEBUG)
         self.inverterRemotePanelLogger.addHandler(fileHandler)
