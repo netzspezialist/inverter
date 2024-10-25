@@ -103,7 +103,7 @@ class InverterCommands:
         elif setting == "batteryMaxChargingCurrent":
             if not re.search(REGEX_INVERTER_INT, value):
                 raise ValueError("Invalid value for batteryMaxChargingCurrent")
-            command = f"MNCHGC{value}"
+            command = f"MNCHGC0{value}"
 
         else:
             raise ValueError("Invalid setting")
