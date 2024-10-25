@@ -87,7 +87,7 @@ class InverterCommands:
 
         return data
     
-    def updateSetting(self, setting: str, value):
+    def updateSetting(self, setting: str, value: str):
         self.logger.info(f'Updating inverter setting [{setting}] with value [{value}]')
         
         if setting == "batteryBulkVoltage":
