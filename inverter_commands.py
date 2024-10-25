@@ -5,6 +5,7 @@ from inverter_connection import InverterConnection
 from inverter_response import InverterResponseConverter
 
 REGEX_INVERTER_FLOAT = '[0-9][0-9]\.[0-9]'
+REGEX_INVERTER_INT = '[0-9][0-9][0-9]'
 
 ENERGY_COMMANDS = { 
     "QET": "^$", 
@@ -98,6 +99,12 @@ class InverterCommands:
             if not re.search(REGEX_INVERTER_FLOAT, value):
                 raise ValueError("Invalid value for batteryBulkVoltage")
             command = f"PBFT{value}"                      
+        
+        elif setting == "batteryMaxChargingCurrent":
+            if not re.search(REGEX_INVERTER_INT, value):
+                raise ValueError("Invalid value for batteryMaxChargingCurrent")
+            command = f"MNCHGC{value}"
+
         else:
             raise ValueError("Invalid setting")
 
