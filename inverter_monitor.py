@@ -20,11 +20,12 @@ class InverterMonitor:
             try:
                 self.logger.debug('Inverter monitor loop running ...')
 
+                
                 # Reset bulk and float voltage to standard values at 20:00
                 now = datetime.now()
                 specific_time = now.replace(hour=20, minute=00, second=0, microsecond=0)
 
-                # Check if current date is different from last execution date
+                """# Check if current date is different from last execution date
                 if self.last_execution_date != now.date():
                     # If current time is close to the specific time (within 600 seconds here)
                     if abs((now - specific_time).total_seconds()) < 600:
@@ -44,7 +45,7 @@ class InverterMonitor:
                             else:
                                 self.logger.error("Inverter bulk setting update failed")
                         else:
-                            self.logger.error("Inverter float setting update failed")
+                            self.logger.error("Inverter float setting update failed") """
 
                 data = self.inverterCommands.qpigs()
                 
