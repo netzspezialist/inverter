@@ -6,6 +6,7 @@ import sys
 from threading import Thread
 from os.path import dirname, abspath
 from inverter_connection import InverterConnection
+from inverter_email_notification import EmailNotification
 from inverter_energy_statistics import InverterEnergyStatistics
 from inverter_monitor import InverterMonitor
 from inverter_commands import InverterCommands
@@ -71,6 +72,11 @@ class InverterService:
         self.inverterRemotePanelLogger.addHandler(fileHandler)
         self.inverterRemotePanel = InverterRemotePanel(self.inverterRemotePanelLogger, self.energyStatistics)
 
+        self.inverterEmailNotificationLogger = logging.getLogger('emailNotification')
+        self.inverterEmailNotificationLogger.setLevel(logging.DEBUG)
+        self.inverterEmailNotificationLogger.addHandler(fileHandler)
+        self.inverterEmailNotification = EmailNotification(self.inverterEmailNotificationLogger, self.energyStatistics)
+
         self.inverterWebAPI = InverterWebAPI(logger, self.inverterCommands)
         self.inverterWebAPIThread = Thread(target = self.inverterWebAPI.start)        
 
@@ -85,6 +91,9 @@ class InverterService:
         
         self.inverterRemotePanelThread = Thread(target = self.inverterRemotePanel.start)
         self.inverterRemotePanelThread.start()
+
+        self.inverterEmailNotification = Thread(target = self.inverterEmailNotification.start)
+        self.inverterEmailNotification.start()
         
         self.logger.info('Starting inverter web API ...')    
         self.inverterWebAPIThread.start()
@@ -102,6 +111,7 @@ class InverterService:
         self.inverterMonitor.stop()
         self.inverterEnergyData.stop()
         self.inverterRemotePanel.stop()
+        self.inverterEmailNotification.stop()
         self.energyStatistics.close()
 
         #self.inverterMqtt.disconnect()

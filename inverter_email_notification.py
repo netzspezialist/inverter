@@ -58,7 +58,7 @@ class EmailNotification:
         
         while self.serviceRunning:
             schedule.run_pending()
-            time.sleep(60)
+            time.sleep(10)
 
             if initalRun is False:
                 self.__send_email_notification()
