@@ -24,6 +24,11 @@ class EmailNotification:
         smtpUsername = os.getenv("INVERTER_SMTP_USERNAME")  # Assuming you've set your email username in an environment variable
         smtpPassword = os.getenv("INVERTER_SMTP_PASSWORD")  # Assuming you've set your email password in an environment variable
 
+        # Check if any of the environment variables are empty
+        if not sender_email or not receiver_email or not smtpServer or not smtpUsername or not smtpPassword:
+            self.logger.error("One or more environment variables are not set.")
+            return
+
         message = MIMEMultipart("alternative")
         message["Subject"] = "Inverter energy output notification"
         message["From"] = sender_email
