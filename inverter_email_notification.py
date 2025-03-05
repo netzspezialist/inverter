@@ -53,7 +53,7 @@ class EmailNotification:
         message.attach(part)
 
         try:
-            server = smtplib.SMTP()  # Use your SMTP server details
+            server = smtplib.SMTP(smtpServer)  # Use your SMTP server details
             server.connect(smtpServer, 587)
             server.ehlo()
             server.starttls()
