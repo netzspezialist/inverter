@@ -53,7 +53,7 @@ class EmailNotification:
         message.attach(part)
 
         try:
-            server = smtplib.SMTP_SSL(smtpServer, 465)  # Use your SMTP server details
+            server = smtplib.SMTP_SSL(smtpServer, 587)  # Use your SMTP server details
             server.login(smtpUsername, smtpPassword)
             server.sendmail(sender_email, receiver_email, message.as_string())
             server.quit()
