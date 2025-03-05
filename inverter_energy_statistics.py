@@ -8,7 +8,6 @@ import time
 class InverterEnergyStatistics:
     def __init__(self, logger):
         self.logger = logger
-        self.conn = self.create_connection()
         script_path = abspath(dirname(__file__))
         dbPath = f'{script_path}/inverter.db'
         self.logger.debug(f'Database path: {dbPath}')
