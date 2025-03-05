@@ -16,6 +16,8 @@ class EmailNotification:
         
     def __send_email_notification(self):
 
+        self.logger.info('Email notification ...')
+
         sender_email = os.getenv("INVERTER_SENDER_EMAIL")  # Assuming you've set your email in an environment variable
         receiver_email = os.getenv("INVERTER_RECEIVER_EMAIL")  # Assuming you've set the receiver email in an environment variable
         smtpServer = os.getenv("INVERTER_SMTP_SERVER")  # Assuming you've set your SMTP server in an environment variable
@@ -44,6 +46,9 @@ class EmailNotification:
         
         {datetime.datetime.now().strftime("%Y-%m-%d")}
         """
+
+        self.logger.info(text)
+
         part = MIMEText(text, "plain")
         message.attach(part)
 
@@ -71,7 +76,7 @@ class EmailNotification:
         self.logger.info('Starting email notification service ...')
 
         self.serviceRunning = True
-        schedule.every().day.at("0:10").do(self.__send_email_notification)
+        schedule.every().day.at("00:10").do(self.__send_email_notification)
 
         self.__loop()
         
