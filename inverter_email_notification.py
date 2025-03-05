@@ -3,15 +3,16 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import os
 import smtplib
+from inverter_energy_statistics import InverterEnergyStatistics
 import schedule
-import time
+import datetime
 
 
 class EmailNotification:
-    def __init__(self, logger):
+    def __init__(self, logger, inverterEnergyStatistics: InverterEnergyStatistics):
         self.logger = logger
         
-    def __send_email_notification(self, execution_time):
+    def __send_email_notification(self):
 
         sender_email = os.getenv("INVERTER_SENDER_EMAIL")  # Assuming you've set your email in an environment variable
         receiver_email = os.getenv("INVERTER_RECEIVER_EMAIL")  # Assuming you've set the receiver email in an environment variable
@@ -39,7 +40,7 @@ class EmailNotification:
         Energie letzte 7 Tage: {energyLast7Days}
         Energie gestern: {energyYesterday}
         
-        {execution_time.strftime("%Y-%m-%d")}.
+        {datetime.datetime.now().strftime("%Y-%m-%d")}
         """
         part = MIMEText(text, "plain")
         message.attach(part)
