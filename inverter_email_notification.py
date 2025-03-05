@@ -6,11 +6,13 @@ import smtplib
 from inverter_energy_statistics import InverterEnergyStatistics
 import schedule
 import datetime
+import time
 
 
 class EmailNotification:
     def __init__(self, logger, inverterEnergyStatistics: InverterEnergyStatistics):
         self.logger = logger
+        self.inverterEnergyStatistics = inverterEnergyStatistics
         
     def __send_email_notification(self):
 

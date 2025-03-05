@@ -92,8 +92,8 @@ class InverterService:
         self.inverterRemotePanelThread = Thread(target = self.inverterRemotePanel.start)
         self.inverterRemotePanelThread.start()
 
-        self.inverterEmailNotification = Thread(target = self.inverterEmailNotification.start)
-        self.inverterEmailNotification.start()
+        self.inverterEmailNotificationThread = Thread(target = self.inverterEmailNotification.start)
+        self.inverterEmailNotificationThread.start()
         
         self.logger.info('Starting inverter web API ...')    
         self.inverterWebAPIThread.start()
@@ -102,6 +102,7 @@ class InverterService:
         self.inverterMonitorThread.join()
         self.inverterEnergyDataThread.join()
         self.inverterRemotePanelThread.join()
+        self.inverterEmailNotificationThread.join()
             
         self.logger.info('Exit inverter service ...')
 
