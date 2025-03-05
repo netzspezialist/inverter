@@ -38,11 +38,11 @@ class EmailNotification:
         text = f"""
         ### Inverter statistics notification ###
 
-        Gesamtenergie: {energyTotal}
-        Energie letzte 12 Monate: {energyLast12Months}
-        Energie letzte 30 Tage: {energyLast30Days}
-        Energie letzte 7 Tage: {energyLast7Days}
-        Energie gestern: {energyYesterday}
+        Gesamtenergie: {energyTotal} kWh
+        Energie letzte 12 Monate: {energyLast12Months} kWh
+        Energie letzte 30 Tage: {energyLast30Days} kWh
+        Energie letzte 7 Tage: {energyLast7Days} kWh
+        Energie gestern: {energyYesterday} kWh
         
         {datetime.datetime.now().strftime("%Y-%m-%d")}
         """
