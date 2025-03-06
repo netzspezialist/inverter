@@ -8,6 +8,7 @@ import schedule
 import datetime
 import time
 
+from inverter_config import emailNotification as config
 
 class EmailNotification:
     def __init__(self, logger, inverterEnergyStatistics: InverterEnergyStatistics):
@@ -18,11 +19,11 @@ class EmailNotification:
 
         self.logger.info('Email notification ...')
 
-        sender_email = os.getenv("INVERTER_SENDER_EMAIL")  # Assuming you've set your email in an environment variable
-        receiver_email = os.getenv("INVERTER_RECEIVER_EMAIL")  # Assuming you've set the receiver email in an environment variable
-        smtpServer = os.getenv("INVERTER_SMTP_SERVER")  # Assuming you've set your SMTP server in an environment variable
-        smtpUsername = os.getenv("INVERTER_SMTP_USERNAME")  # Assuming you've set your email username in an environment variable
-        smtpPassword = os.getenv("INVERTER_SMTP_PASSWORD")  # Assuming you've set your email password in an environment variable
+        sender_email = config["sender_email"]
+        receiver_email = config["receiver_email"]
+        smtpServer = config["smtp_server"]
+        smtpUsername = config["smtp_username"]
+        smtpPassword = config["smtp_password"]
 
         # Check if any of the environment variables are empty
         if not sender_email or not receiver_email or not smtpServer or not smtpUsername or not smtpPassword:
@@ -30,7 +31,7 @@ class EmailNotification:
             return
 
         message = MIMEMultipart("alternative")
-        message["Subject"] = "Inverter energy output notification"
+        message["Subject"] = f"Wechselrichterprotokoll vom {datetime.datetime.now().strftime("%Y-%m-%d")}"
         message["From"] = sender_email
         message["To"] = receiver_email
 
@@ -41,7 +42,7 @@ class EmailNotification:
         energyYesterday = round(self.inverterEnergyStatistics.getEnergyDay('Output', True) / 1000, 2)
 
         text = f"""
-        ### Inverter statistics notification ###
+        ### Wechselrichterprotokoll vom {datetime.datetime.now().strftime("%Y-%m-%d")} ###
 
         Gesamtenergie: {energyTotal} kWh
         Energie letzte 12 Monate: {energyLast12Months} kWh
@@ -82,6 +83,10 @@ class EmailNotification:
 
     def start(self):
         self.logger.info('Starting email notification service ...')
+
+        if not config["enabled"]:
+            self.logger.info('Email notification service is disabled')
+            return
 
         self.serviceRunning = True
         schedule.every().day.at("00:10").do(self.__send_email_notification)

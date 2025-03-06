@@ -23,3 +23,11 @@ inverter = {
     "connectionType": "serial",  # serial or usb
     "port": "/dev/ttyUSB1" # serial port /dev/ttyUSB0" or usb device /dev/hidraw0
 }
+emailNotification = {
+    "enabled": False,
+    "sender_email": "",
+    "receiver_email": "",
+    "smtp_server": "",
+    "smtp_username": "",
+    "smtp_password": ""    
+}
