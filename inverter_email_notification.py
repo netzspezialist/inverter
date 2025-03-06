@@ -30,8 +30,9 @@ class EmailNotification:
             self.logger.error("One or more environment variables are not set.")
             return
 
+        protocolDate = datetime.datetime.now().strftime("%Y-%m-%d")
         message = MIMEMultipart("alternative")
-        message["Subject"] = f"Wechselrichterprotokoll vom {datetime.datetime.now().strftime("%Y-%m-%d")}"
+        message["Subject"] = f"Wechselrichterprotokoll {protocolDate}"
         message["From"] = sender_email
         message["To"] = receiver_email
 
@@ -42,15 +43,13 @@ class EmailNotification:
         energyYesterday = round(self.inverterEnergyStatistics.getEnergyDay('Output', True) / 1000, 2)
 
         text = f"""
-        ### Wechselrichterprotokoll vom {datetime.datetime.now().strftime("%Y-%m-%d")} ###
+        ### Wechselrichterprotokoll vom {protocolDate} ###
 
         Gesamtenergie: {energyTotal} kWh
         Energie letzte 12 Monate: {energyLast12Months} kWh
         Energie letzte 30 Tage: {energyLast30Days} kWh
         Energie letzte 7 Tage: {energyLast7Days} kWh
         Energie gestern: {energyYesterday} kWh
-        
-        {datetime.datetime.now().strftime("%Y-%m-%d")}
         """
 
         self.logger.info(text)
