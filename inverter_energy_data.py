@@ -54,7 +54,7 @@ class InverterEnergyData:
                         rowExists = self._rowExists(energyFlow, timestamp)
                         energy = 0
                         
-                        if rowExists is False or day == current_day:
+                        if rowExists is False or day == current_day or day == current_day - 1:
                             response = self.inverterCommands.energy(f'{energyFlowCommands[energyFlow]}d', str(timestamp))
                             energy = response["energy"]
                             
@@ -72,14 +72,14 @@ class InverterEnergyData:
                         rowExists = self._rowExists(energyFlow, timestamp)
                         energy = 0
 
-                        if rowExists is False or month == current_month:
+                        if rowExists is False or month == current_month or (day == 2 and month == current_month - 1):
                             response = self.inverterCommands.energy(f'{energyFlowCommands[energyFlow]}m', str(year * 100 + month))
                             energy = response["energy"]
 
-                        if rowExists is False:
-                            self.__insertRow(energyFlow, timestamp, energy)
-                        elif month == current_month:
-                            self.__updateRow(energyFlow, timestamp, energy)
+                            if rowExists is False:
+                                self.__insertRow(energyFlow, timestamp, energy)
+                            else:
+                                self.__updateRow(energyFlow, timestamp, energy)
 
                         month = month - 1
                     
@@ -94,10 +94,10 @@ class InverterEnergyData:
                             response = self.inverterCommands.energy(f'{energyFlowCommands[energyFlow]}y', str(year))
                             energy = response["energy"]
 
-                        if rowExists is False:
-                            self.__insertRow(energyFlow, timestamp, energy)
-                        elif year == current_year:
-                            self.__updateRow(energyFlow, timestamp, energy)
+                            if rowExists is False:
+                                self.__insertRow(energyFlow, timestamp, energy)
+                            elif year == current_year:
+                                self.__updateRow(energyFlow, timestamp, energy)
 
                         year = year - 1
                     else:
@@ -153,7 +153,7 @@ class InverterEnergyData:
         self.__initializeShema()
         self.__writingEnergyData()
 
-        schedule.every().hour.at(":59").do(self.__writingEnergyData)
+        schedule.every().hour.at(":02").do(self.__writingEnergyData)
 
         self.__loop()
 

@@ -87,3 +87,10 @@ class InverterEnergyStatistics:
         self.sql.execute(f'select sum(value) from Energy{direction} where timestamp in ( {timestamps} )')
         energy = self.sql.fetchone()
         return energy[0] if energy is not None else 0
+    
+    def getSavedEnergy(self):
+        # 03.2022 - 06.2022 31,33 ct/kWh octupus
+        # 07.2022 - 07.2023 27,62 ct/kWh
+        # 08.2023 - 2025 27,45 ct/kWh
+        # 01.08.2025 - 31.07.2027 26,75 ct/kWh
+        self.logger.debug(f'Getting saved energy')

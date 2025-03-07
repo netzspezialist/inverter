@@ -21,7 +21,7 @@ inverterBatteryManager = {
 }
 inverter = {
     "connectionType": "serial",  # serial or usb
-    "port": "/dev/ttyUSB1" # serial port /dev/ttyUSB0" or usb device /dev/hidraw0
+    "port": "/dev/usbINVERTER" # name of udev rule
 }
 emailNotification = {
     "enabled": False,
@@ -29,5 +29,5 @@ emailNotification = {
     "receiver_email": "",
     "smtp_server": "",
     "smtp_username": "",
-    "smtp_password": "asd"    
+    "smtp_password": ""    
 }

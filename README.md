@@ -46,8 +46,14 @@ kill <pid>
 ```
 sudo usermod -a -G plugdev <username>
 
+udevadm info -a -n /dev/ttyUSB0 | grep -E "idVendor|idProduct|manufacturer"
+udevadm info -a -n /dev/ttyUSB1 | grep -E "idVendor|idProduct|manufacturer"
+
 sudo nano /etc/udev/rules.d/99-usb-serial-permissions.rules
 CONTENT:
-KERNEL=="hidraw*", SUBSYSTEM=="hidraw", MODE="0660", GROUP="plugdev"
-KERNEL=="ttyUSB*", SUBSYSTEM=="tty", MODE="0660", GROUP="plugdev"
+KERNEL=="ttyUSB*", SUBSYSTEM=="tty", MODE="0660", GROUP="plugdev" 
+SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7523" SYMLINK+="usb_bms"
+SUBSYSTEM=="tty", ATTRS{idVendor}=="067b", ATTRS{idProduct}=="2303" SYMLINK+="usb_inverter"
 ```
+
+sudo reboot
