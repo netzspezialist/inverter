@@ -68,7 +68,7 @@ class SmartBatteryManagementSystem:
 
         timestamp = datetime.datetime.now()
 
-        soc = data['SOC']
+        soc = float(data['SOC'])
         voltage = float(data['PMV'])
         current = float(data['PMA'])
         temperature = data['TMP']
