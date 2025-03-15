@@ -112,6 +112,7 @@ class InverterService:
         self.inverterEnergyDataThread.join()
         self.inverterRemotePanelThread.join()
         self.inverterEmailNotificationThread.join()
+        self.smartbmsThread.join()
             
         self.logger.info('Exit inverter service ...')
 

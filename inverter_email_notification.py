@@ -77,7 +77,7 @@ class EmailNotification:
             time.sleep(60)
 
             if initalRun is False:
-                self.__send_email_notification()
+                # self.__send_email_notification()
                 initalRun = True
 
     def start(self):

@@ -47,7 +47,7 @@ class SmartBatteryManagementSystem:
     def on_message(self, client, userdata, message):
         self.logger.debug(f'Message received: {message.payload.decode()}')
 
-        
+
 
     def uploadToInflux(self, data):
         self.logger.debug(f'Uploading data to influx: {data}')
@@ -105,4 +105,4 @@ class SmartBatteryManagementSystem:
         self.logger.info('Inverter battery manager loop started ')
         while self.serviceRunning:
             # check for message validity
-            time.sleep(5)
+            time.sleep(2)
