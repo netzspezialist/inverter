@@ -14,6 +14,7 @@ from inverter_mqtt import InverterMqtt
 from inverter_remotepanel import InverterRemotePanel
 from inverter_webapi import InverterWebAPI
 from inverter_energy_data import InverterEnergyData
+from smartbms import SmartBatteryManagementSystem
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -53,12 +54,12 @@ class InverterService:
         self.inverterCommands: InverterCommands = InverterCommands(self.inverterConnection, inverterCommandsLogger)
 
         inverterMonitorLogger = logging.getLogger('monitor')
-        inverterMonitorLogger.setLevel(logging.INFO)
+        inverterMonitorLogger.setLevel(logging.WARNING)
         inverterMonitorLogger.addHandler(fileHandler)
         self.inverterMonitor: InverterMonitor = InverterMonitor(inverterMonitorLogger, self.inverterCommands)
 
         inverterEnergyDataLogger = logging.getLogger('energyData')
-        inverterEnergyDataLogger.setLevel(logging.INFO)
+        inverterEnergyDataLogger.setLevel(logging.WARNING)
         inverterEnergyDataLogger.addHandler(fileHandler)
         self.inverterEnergyData: InverterEnergyData = InverterEnergyData(inverterEnergyDataLogger, self.inverterCommands)
 
@@ -68,14 +69,19 @@ class InverterService:
         self.energyStatistics = InverterEnergyStatistics(self.energyStatisticsLogger)
        
         self.inverterRemotePanelLogger = logging.getLogger('remotePanel')
-        self.inverterRemotePanelLogger.setLevel(logging.DEBUG)
+        self.inverterRemotePanelLogger.setLevel(logging.WARNING)
         self.inverterRemotePanelLogger.addHandler(fileHandler)
         self.inverterRemotePanel = InverterRemotePanel(self.inverterRemotePanelLogger, self.energyStatistics)
 
         self.inverterEmailNotificationLogger = logging.getLogger('emailNotification')
-        self.inverterEmailNotificationLogger.setLevel(logging.DEBUG)
+        self.inverterEmailNotificationLogger.setLevel(logging.WARNING)
         self.inverterEmailNotificationLogger.addHandler(fileHandler)
         self.inverterEmailNotification = EmailNotification(self.inverterEmailNotificationLogger, self.energyStatistics)
+
+        self.smartbmsLogger = logging.getLogger('smartbms')
+        self.smartbmsLogger.setLevel(logging.WARNING)
+        self.smartbmsLogger.addHandler(fileHandler)
+        self.smartbms = SmartBatteryManagementSystem(self.smartbmsLogger, self.inverterCommands)      
 
         self.inverterWebAPI = InverterWebAPI(logger, self.inverterCommands)
         self.inverterWebAPIThread = Thread(target = self.inverterWebAPI.start)        
@@ -94,6 +100,9 @@ class InverterService:
 
         self.inverterEmailNotificationThread = Thread(target = self.inverterEmailNotification.start)
         self.inverterEmailNotificationThread.start()
+
+        self.smartbmsThread = Thread(target = self.smartbms.start)
+        self.smartbmsThread.start()
         
         self.logger.info('Starting inverter web API ...')    
         self.inverterWebAPIThread.start()
