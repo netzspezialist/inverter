@@ -1,4 +1,6 @@
 import asyncio
+import datetime
+import json
 import random
 import time
 import paho.mqtt.client as mqtt
@@ -6,6 +8,10 @@ import paho.mqtt.client as mqtt
 from inverter_commands import InverterCommands
 from inverter_config import mqtt as mqttConfig
 from inverter_config import smartbms as smartbmsConfig
+from inverter_config import influx as influxConfig
+
+from influxdb_client import InfluxDBClient, Point, WritePrecision
+from influxdb_client.client.write_api import SYNCHRONOUS
 
 class SmartBatteryManagementSystem:
     def __init__(self, logger, inverterCommands: InverterCommands):        
@@ -18,8 +24,20 @@ class SmartBatteryManagementSystem:
   
         self.topic = smartbmsConfig["topic"]
         self.enabled = smartbmsConfig["enabled"]
-        self.influxUpload = smartbmsConfig["influxUpload"]
+        self.influxUploadEnabled = smartbmsConfig["influxUploadEnabled"]
         self.influxUploadMinimumDelaySeconds = smartbmsConfig["influxUploadMinimumDelaySeconds"]
+        self.influxLastUploadTime = None  # Initialize the last upload time
+
+        self.enabled = influxConfig["enabled"]
+        token = influxConfig["token"]
+        org = influxConfig["org"]
+        bucket = influxConfig["bucket"]
+        url = influxConfig["url"]
+        write_client = InfluxDBClient(url=url, token=token, org=org)
+
+        self.org=org
+        self.bucket=bucket
+        self.write_api = write_client.write_api(write_options=SYNCHRONOUS)
         
 
     def _connect(self):
@@ -43,12 +61,55 @@ class SmartBatteryManagementSystem:
         self.client.loop_start()
 
     def on_message(self, client, userdata, message):
-        self.logger.debug(f'Message received: {message.payload.decode()}')
+        payload = message.payload.decode()
+        self.logger.debug(f'Message received: {payload}')
+        
+        data = json.loads(payload)
 
+        timestamp = datetime.datetime.now()
 
+        soc = data['SOC']
+        voltage = data['PMV']
+        current = data['PMA']
+        temperature = data['TMP']
+        voltages = [data['bat'][str(i)] / 1000.0 for i in range(16)]
 
-    def uploadToInflux(self, data):
-        self.logger.debug(f'Uploading data to influx: {data}')
+        self.logger.debug(f'Voltage: {voltage}V, SOC: {soc}%, Current: {current}A, Temperature: {temperature}°C, Cell voltages: {voltages}')
+
+        if not self.influxUploadEnabled:
+            return
+        
+        if self.influxLastUploadTime and (timestamp - self.influxLastUploadTime).total_seconds() < self.influxUploadMinimumDelaySeconds:
+            self.logger.debug('Minimum delay not reached, skipping upload.')
+            return
+
+        point = (
+            Point("bms")
+            .field("voltage", voltage)
+            .field("soc", soc)
+            .field("current", current)
+            .field("temperature", temperature)
+            .field("cellVoltage01", voltages[0])
+            .field("cellVoltage02", voltages[1])
+            .field("cellVoltage03", voltages[2])
+            .field("cellVoltage04", voltages[3])
+            .field("cellVoltage05", voltages[4])
+            .field("cellVoltage06", voltages[5])
+            .field("cellVoltage07", voltages[6])
+            .field("cellVoltage08", voltages[7])
+            .field("cellVoltage09", voltages[8])
+            .field("cellVoltage10", voltages[9])
+            .field("cellVoltage11", voltages[10])
+            .field("cellVoltage12", voltages[11])
+            .field("cellVoltage13", voltages[12])
+            .field("cellVoltage14", voltages[13])
+            .field("cellVoltage15", voltages[14])
+            .field("cellVoltage16", voltages[15])            
+            .time(int(timestamp.timestamp()), WritePrecision.S)
+        )
+        
+        self.write_api.write(bucket=self.bucket, org=self.org, record=point)
+        self.influxLastUploadTime = timestamp
 
 
     def setVoltage(self, targetVoltage):
