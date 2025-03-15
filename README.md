@@ -52,8 +52,8 @@ udevadm info -a -n /dev/ttyUSB1 | grep -E "idVendor|idProduct|manufacturer"
 sudo nano /etc/udev/rules.d/99-usb-serial-permissions.rules
 CONTENT:
 KERNEL=="ttyUSB*", SUBSYSTEM=="tty", MODE="0660", GROUP="plugdev" 
-SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7523" SYMLINK+="usb_bms"
-SUBSYSTEM=="tty", ATTRS{idVendor}=="067b", ATTRS{idProduct}=="2303" SYMLINK+="usb_inverter"
+SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7523" SYMLINK+="usbBMS"
+SUBSYSTEM=="tty", ATTRS{idVendor}=="067b", ATTRS{idProduct}=="2303" SYMLINK+="usbINVERTER"
 ```
 
 sudo reboot

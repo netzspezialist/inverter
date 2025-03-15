@@ -5,6 +5,7 @@ influx = {
     "bucket": "energy",
     "token": '8NSTtcmBwEUUoOl5E3nhvoIOwIzZgNbUbOpdhN7UOMY452Y7srgClN5JZBerPSBBlelIR2Q6ZSukRqPg77GZOA==',
 }
+
 mqtt = { 
     "enabled": True,
     "broker_address": "localhost",
@@ -14,15 +15,25 @@ mqtt = {
     "username": "user",
     "password": "password"
 }
+
 inverterBatteryManager = {
     "enabled": True,
     "topic": "bms-commands",
     "defaultVoltage": "54.8"
 }
+
+smartbms = {
+    "enabled": True,
+    "topic": smartbms_01,
+    "influxUpload": True,
+    "influxUploadMinimumDelaySeconds": 60
+}
+
 inverter = {
     "connectionType": "serial",  # serial or usb
     "port": "/dev/usbINVERTER" # name of udev rule
 }
+
 emailNotification = {
     "enabled": False,
     "sender_email": "",

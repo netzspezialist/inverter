@@ -5,9 +5,9 @@ import paho.mqtt.client as mqtt
 
 from inverter_commands import InverterCommands
 from inverter_config import mqtt as mqttConfig
-from inverter_config import inverterBatteryManager as inverterBatteryManagerConfig
+from inverter_config import smartbms as smartbmsConfig
 
-class InverterBatteryManager:
+class SmartBatteryManagementSystem:
     def __init__(self, logger, inverterCommands: InverterCommands):
         self.logger = logger
         self.inverterCommands = inverterCommands
@@ -16,8 +16,11 @@ class InverterBatteryManager:
         client_id += f'_{random.randint(0, 1000)}' 
         self.client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id)
   
-        self.topic = inverterBatteryManagerConfig["topic"]
-        self.enabled = inverterBatteryManagerConfig["enabled"]
+        self.topic = smartbmsConfig["topic"]
+        self.enabled = smartbmsConfig["enabled"]
+        self.influxUpload = smartbmsConfig["influxUpload"]
+        self.influxUploadMinimumDelaySeconds = smartbmsConfig["influxUploadMinimumDelaySeconds"]
+        
 
     def connect(self):
         if not self.enabled:
@@ -26,11 +29,12 @@ class InverterBatteryManager:
         def on_connect(client, userdata, flags, rc, properties):
             if rc == 0:
                 self.logger.info("Connected to MQTT Broker!")
+                self.logger.debug(f'Data: client {client} userdata {userdata} flags {flags} rc {rc} properties {properties}')
+                self.logger.debug(f'Subscribing to topic {self.topic}') 
                 self.client.subscribe(self.topic)
             else:
                 self.logger.error(f"Failed to connect, return code [{rc}]")
 
-        #self.client.username_pw_set(mqttConfig["username"], mqttConfig["password"])
         broker_address = mqttConfig["broker_address"]
         port = mqttConfig["port"]
         self.logger.info(f'Connecting to mqtt broker {broker_address}:{port}')
@@ -42,6 +46,12 @@ class InverterBatteryManager:
 
     def on_message(self, client, userdata, message):
         self.logger.debug(f'Message received: {message.payload.decode()}')
+
+        
+
+    def uploadToInflux(self, data):
+        self.logger.debug(f'Uploading data to influx: {data}')
+
 
     def setVoltage(self, targetVoltage):
         self.logger.debug(f'Setting voltage to {targetVoltage}')
@@ -63,8 +73,6 @@ class InverterBatteryManager:
             return
 
         self.logger.debug(f'Current settings: {currentSettings}')
-
-
         self.inverterCommands.updateSetting("batteryBulkVoltage", targetVoltage)
 
     def disconnect(self):
@@ -92,8 +100,6 @@ class InverterBatteryManager:
 
     def stop(self):
         self.logger.info('Stopping inverter battery manager ...')
-
-
 
     def loop(self):
         self.logger.info('Inverter battery manager loop started ')
