@@ -8,7 +8,7 @@ from inverter_config import mqtt as mqttConfig
 from inverter_config import smartbms as smartbmsConfig
 
 class SmartBatteryManagementSystem:
-    def __init__(self, logger, inverterCommands: InverterCommands):
+    def __init__(self, logger, inverterCommands: InverterCommands):        
         self.logger = logger
         self.inverterCommands = inverterCommands
         self.logger.info('Creating mqtt client ...')
@@ -22,9 +22,7 @@ class SmartBatteryManagementSystem:
         self.influxUploadMinimumDelaySeconds = smartbmsConfig["influxUploadMinimumDelaySeconds"]
         
 
-    def connect(self):
-        if not self.enabled:
-            return
+    def _connect(self):
 
         def on_connect(client, userdata, flags, rc, properties):
             if rc == 0:
@@ -85,9 +83,14 @@ class SmartBatteryManagementSystem:
         self.client.disconnect()        
 
     def start(self):
-        self.logger.info('Starting battery manager ...')
+        if not self.enabled:
+            self.logger.info('Smart BMS Client is disabled')
+            return
+
+        self.logger.info('Starting Smart BMS Client ...')
+
         self.serviceRunning = True
-        self.mqtt.connect()
+        self._connect()
 
         loop = asyncio.new_event_loop()
         loop.create_task(self.loop())

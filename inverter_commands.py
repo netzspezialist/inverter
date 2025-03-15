@@ -77,7 +77,7 @@ class InverterCommands:
         startTime = datetime.now()        
         response = self.inverterConnection.execute(command)
         stopTime = datetime.now()
-        self.logger.info(f'energy command: {command} result: {response}')
+        self.logger.debug(f'energy command: {command} result: {response}')
 
         timestamp = InverterResponseConverter.createTimeStamp(startTime, stopTime)
 
