@@ -25,7 +25,7 @@ inverterBatteryManager = {
 smartbms = {
     "enabled": True,
     "topic": "smartbms_01",
-    "influxUpload": True,
+    "influxUploadEnabled": True,
     "influxUploadMinimumDelaySeconds": 60
 }
 
