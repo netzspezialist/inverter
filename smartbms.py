@@ -74,6 +74,9 @@ class SmartBatteryManagementSystem:
         temperature = data['TMP']
         voltages = [data['bat'][str(i)] / 1000.0 for i in range(16)]
 
+        highestCellVoltage = max(voltages)
+        lowestCellVoltage = min(voltages)
+
         self.logger.debug(f'Voltage: {voltage}V, SOC: {soc}%, Current: {current}A, Temperature: {temperature}°C, Cell voltages: {voltages}')
 
         if not self.influxUploadEnabled:
@@ -104,7 +107,9 @@ class SmartBatteryManagementSystem:
             .field("cellVoltage13", voltages[12])
             .field("cellVoltage14", voltages[13])
             .field("cellVoltage15", voltages[14])
-            .field("cellVoltage16", voltages[15])            
+            .field("cellVoltage16", voltages[15])
+            .field("highestCellVoltage", highestCellVoltage)
+            .field("lowestCellVoltage", lowestCellVoltage)            
             .time(int(timestamp.timestamp()), WritePrecision.S)
         )
         
