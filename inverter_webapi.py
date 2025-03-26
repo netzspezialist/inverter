@@ -12,7 +12,7 @@ class InverterWebAPI(Flask):
 
         self.add_url_rule('/api/status', 'get_inverter_status', self.get_inverter_status, methods=['GET'])
         self.add_url_rule('/api/settings', 'get_inverter_settings', self.get_inverter_settings, methods=['GET'])
-        self.add_url_rule('/api/bms', 'get_bms_data', self.get_inverter_settings, methods=['GET'])
+        self.add_url_rule('/api/bms', 'get_bms_data', self.get_bms_data, methods=['GET'])
         self.add_url_rule('/api/settings', 'patch_inverter_settings', self.patch_inverter_settings, methods=['PATCH'])
         self.add_url_rule('/api/energy', 'get_inverter_energy', self.get_inverter_energy, methods=['POST'])
         self.json.sort_keys = False
