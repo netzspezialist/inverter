@@ -40,7 +40,7 @@ class InverterWebAPI(Flask):
         self.logger.info('get bms data ...')
         data = self.inverterCommands.qbms()
         self.logger.info(f'Inverter data: {data}')
-        data["timestamp"] = data["timestamp"].isoformat()[:-3]
+        #data["timestamp"] = data["timestamp"].isoformat()[:-3]
         return data
     
     def patch_inverter_settings(self):
