@@ -59,6 +59,22 @@ class InverterCommands:
 
         return data
     
+    def qbms(self):
+        self.logger.debug('Getting QBMS...')
+        startTime = datetime.now()        
+        response = self.inverterConnection.execute("QBMS")
+        stopTime = datetime.now()
+        self.logger.debug(f'qbms result: {response}')
+
+        command = "qpiri"
+        timestamp = InverterResponseConverter.createTimeStamp(startTime, stopTime)
+
+        #data = InverterResponseConverter.qpiri(command, timestamp, response)
+
+        self.logger.debug(f'qbms data: {response}')
+
+        return response
+    
     def energy(self, command: str, timestamp: int):
         self.logger.debug(f'Getting energy data [{command}{timestamp}]')
 

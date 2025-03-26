@@ -7,9 +7,9 @@ User=hildinger
 Type=simple
 Restart=always
 RestartSec=60
-VIRTUAL_ENV=/home/hildinger/energy/inverter/venv
+Environment=VIRTUAL_ENV=/home/hildinger/energy/inverter/venv
 Environment=PATH=$VIRTUAL_ENV/bin:$PATH
-ExecStart=python3 /home/hildinger/energy/inverter/inverter_service.py
+ExecStart=/home/hildinger/energy/inverter/venv/bin/python3 /home/hildinger/energy/inverter/inverter_service.py
 KillSignal=SIGINT
 
 [Install]
