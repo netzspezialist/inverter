@@ -61,11 +61,11 @@ class InverterWebAPI(Flask):
         timestamp = data["timestamp"]
         response = self.inverterCommands.energy(command, timestamp)
 
-        '''data = { 
+        data = { 
             "command": "energy", 
             "timestamp": response["timestamp"].isoformat()[:-3], 
             "energy": response["energy"],
-        }'''
+        }
 
         self.logger.info(f'Inverter data: {data}')
         return jsonify(response)
