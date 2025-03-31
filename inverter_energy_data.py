@@ -49,32 +49,34 @@ class InverterEnergyData:
                 
                 while not (initDaysCompleted and initMonthsCompleted and initYearsCompleted):
                     timestamp = year * 10000 + month * 100 + day            
-                    if day > 0:
-                        self.logger.debug(f'Updating energy [{energyFlow}] for day [{timestamp}]')
+                    if day > 0:                        
                         rowExists = self._rowExists(energyFlow, timestamp)
                         energy = 0
                         
                         if rowExists is False or day == current_day or day == current_day - 1:
                             response = self.inverterCommands.energy(f'{energyFlowCommands[energyFlow]}d', str(timestamp))
                             energy = response["energy"]
+
+                        self.logger.info(f'Updating energy [{energyFlow}] for day [{timestamp}] to [{energy}] Wh')
                             
                         if rowExists is False:
                             self.__insertRow(energyFlow, timestamp, energy)
-                        elif day == current_day:
+                        else:
                             self.__updateRow(energyFlow, timestamp, energy)
                         
                         day = day - 1
 
                     elif month > 0:
                         initDaysCompleted = True
-                    
-                        self.logger.debug(f'Updating energy [{energyFlow}] for month [{timestamp}]')
+                                            
                         rowExists = self._rowExists(energyFlow, timestamp)
                         energy = 0
 
                         if rowExists is False or month == current_month or (day == 2 and month == current_month - 1):
                             response = self.inverterCommands.energy(f'{energyFlowCommands[energyFlow]}m', str(year * 100 + month))
                             energy = response["energy"]
+
+                            self.logger.info(f'Updating energy [{energyFlow}] for month [{timestamp}] to [{energy}] Wh')
 
                             if rowExists is False:
                                 self.__insertRow(energyFlow, timestamp, energy)
@@ -85,14 +87,15 @@ class InverterEnergyData:
                     
                     elif year > 2021:
                         initMonthsCompleted = True
-            
-                        self.logger.debug(f'Updating energy [{energyFlow}] for year [{timestamp}]')
+                                    
                         rowExists = self._rowExists(energyFlow, timestamp)
                         energy = 0
 
                         if rowExists is False or year == current_year:
                             response = self.inverterCommands.energy(f'{energyFlowCommands[energyFlow]}y', str(year))
                             energy = response["energy"]
+
+                            self.logger.info(f'Updating energy [{energyFlow}] for year [{timestamp}] to [{energy}] Wh')
 
                             if rowExists is False:
                                 self.__insertRow(energyFlow, timestamp, energy)
