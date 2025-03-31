@@ -49,12 +49,12 @@ class InverterService:
         self.inverterConnection = InverterConnection(inverterConnectionLogger)
         
         inverterCommandsLogger = logging.getLogger('commands')
-        inverterCommandsLogger.setLevel(logging.DEBUG)
+        inverterCommandsLogger.setLevel(logging.INFO)
         inverterCommandsLogger.addHandler(fileHandler)
         self.inverterCommands: InverterCommands = InverterCommands(self.inverterConnection, inverterCommandsLogger)
 
         inverterMonitorLogger = logging.getLogger('monitor')
-        inverterMonitorLogger.setLevel(logging.WARNING)
+        inverterMonitorLogger.setLevel(logging.INFO)
         inverterMonitorLogger.addHandler(fileHandler)
         self.inverterMonitor: InverterMonitor = InverterMonitor(inverterMonitorLogger, self.inverterCommands)
 
@@ -69,12 +69,12 @@ class InverterService:
         self.energyStatistics = InverterEnergyStatistics(self.energyStatisticsLogger)
        
         self.inverterRemotePanelLogger = logging.getLogger('remotePanel')
-        self.inverterRemotePanelLogger.setLevel(logging.WARNING)
+        self.inverterRemotePanelLogger.setLevel(logging.INFO)
         self.inverterRemotePanelLogger.addHandler(fileHandler)
         self.inverterRemotePanel = InverterRemotePanel(self.inverterRemotePanelLogger, self.energyStatistics)
 
         self.inverterEmailNotificationLogger = logging.getLogger('emailNotification')
-        self.inverterEmailNotificationLogger.setLevel(logging.WARNING)
+        self.inverterEmailNotificationLogger.setLevel(logging.INFO)
         self.inverterEmailNotificationLogger.addHandler(fileHandler)
         self.inverterEmailNotification = EmailNotification(self.inverterEmailNotificationLogger, self.energyStatistics)
 
