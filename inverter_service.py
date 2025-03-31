@@ -59,12 +59,12 @@ class InverterService:
         self.inverterMonitor: InverterMonitor = InverterMonitor(inverterMonitorLogger, self.inverterCommands)
 
         inverterEnergyDataLogger = logging.getLogger('energyData')
-        inverterEnergyDataLogger.setLevel(logging.WARNING)
+        inverterEnergyDataLogger.setLevel(logging.INFO)
         inverterEnergyDataLogger.addHandler(fileHandler)
         self.inverterEnergyData: InverterEnergyData = InverterEnergyData(inverterEnergyDataLogger, self.inverterCommands)
 
         self.energyStatisticsLogger = logging.getLogger('energyStatistics')
-        self.energyStatisticsLogger.setLevel(logging.WARNING)
+        self.energyStatisticsLogger.setLevel(logging.INFO)
         self.energyStatisticsLogger.addHandler(fileHandler)
         self.energyStatistics = InverterEnergyStatistics(self.energyStatisticsLogger)
        
