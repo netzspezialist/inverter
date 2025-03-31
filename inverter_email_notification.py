@@ -88,7 +88,7 @@ class EmailNotification:
             return
 
         self.serviceRunning = True
-        schedule.every().day.at("00:10").do(self.__send_email_notification)
+        schedule.every().day.at("03:10").do(self.__send_email_notification)
 
         self.__loop()
         
