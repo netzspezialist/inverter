@@ -49,7 +49,7 @@ class InverterService:
         self.inverterConnection = InverterConnection(inverterConnectionLogger)
         
         inverterCommandsLogger = logging.getLogger('commands')
-        inverterCommandsLogger.setLevel(logging.INFO)
+        inverterCommandsLogger.setLevel(logging.DEBUG)
         inverterCommandsLogger.addHandler(fileHandler)
         self.inverterCommands: InverterCommands = InverterCommands(self.inverterConnection, inverterCommandsLogger)
 
