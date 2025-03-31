@@ -59,10 +59,10 @@ class InverterEnergyData:
                             response = self.inverterCommands.energy(f'{energyFlowCommands[energyFlow]}d', str(timestamp))
                             energy = response["energy"]                        
                             
-                        if rowExists is False:
-                            self.__insertRow(energyFlow, timestamp, energy)
-                        else:
-                            self.__updateRow(energyFlow, timestamp, energy)
+                            if rowExists is False:
+                                self.__insertRow(energyFlow, timestamp, energy)
+                            else:
+                                self.__updateRow(energyFlow, timestamp, energy)
                         
                         day = day - 1
 
