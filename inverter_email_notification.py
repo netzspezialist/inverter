@@ -82,8 +82,6 @@ class EmailNotification:
             self.logger.info('Email notification service is disabled')
             return
         
-        self.__send_email_notification()
-
         self.serviceRunning = True
         schedule.every().day.at("03:10:00").do(self.__send_email_notification)
 
