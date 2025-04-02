@@ -149,7 +149,7 @@ class InverterEnergyData:
         dbPath = f'{script_path}/inverter.db'
         self.logger.debug(f'Database path: {dbPath}')
 
-        self.connection = sqlite3.connect(dbPath)
+        self.connection = sqlite3.connect(dbPath, check_same_thread=False)
         self.sql = self.connection.cursor()
         sqlVersion = self.sql.execute('SELECT SQLITE_VERSION()')
         self.logger.info(f'SQLite version: {sqlVersion.fetchone()}')

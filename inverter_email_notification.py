@@ -14,6 +14,7 @@ class EmailNotification:
     def __init__(self, logger, inverterEnergyStatistics: InverterEnergyStatistics):
         self.logger = logger
         self.inverterEnergyStatistics = inverterEnergyStatistics
+        self.lastSentEmail = time.time()
         
     def __send_email_notification(self):
 
@@ -69,12 +70,13 @@ class EmailNotification:
         except Exception as e:
             self.logger.error(f"Failed to send email notification: {e}")
 
+
     def __loop(self):          
         initalRun = False
         
         while self.serviceRunning:
             schedule.run_pending()
-            time.sleep(40)  # Sleep for 2 minutes
+            time.sleep(120)  # Sleep for 2 minutes
 
             if initalRun is False:
                 # self.__send_email_notification()
@@ -88,7 +90,7 @@ class EmailNotification:
             return
 
         self.serviceRunning = True
-        schedule.every().day.at("03:10").do(self.__send_email_notification)
+        schedule.every().day.at("03:10:00").do(self.__send_email_notification)
 
         self.__loop()
         
