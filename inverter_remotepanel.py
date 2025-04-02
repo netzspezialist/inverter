@@ -48,12 +48,14 @@ class InverterRemotePanel:
         initalRun = False
         
         while self.serviceRunning:
-            schedule.run_pending()
-            time.sleep(10)
 
             if initalRun is False and self.inverterMqtt.isConected() is True:
                 self.__updateEnergyOutput()
                 initalRun = True
+
+            schedule.run_pending()
+            time.sleep(1)
+
 
     def start(self):
         self.logger.info('Starting remote panel ...')

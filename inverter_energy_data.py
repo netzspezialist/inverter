@@ -138,7 +138,7 @@ class InverterEnergyData:
     def __loop(self):          
         while self.serviceRunning:
             schedule.run_pending()
-            time.sleep(10)
+            time.sleep(1)
 
 
     def start(self):

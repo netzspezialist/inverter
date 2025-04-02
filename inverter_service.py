@@ -20,6 +20,9 @@ from smartbms import SmartBatteryManagementSystem
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
+logger = logging.getLogger("schedule")
+logger.setLevel(logging.DEBUG)
+
 script_path = abspath(dirname(__file__))
 
 logPath = f'{script_path}/log'
@@ -90,19 +93,19 @@ class InverterService:
     def start(self):
         self.logger.info('Starting inverter service ...')
 
-        self.inverterMonitorThread = Thread(target = self.inverterMonitor.start)
+        self.inverterMonitorThread = Thread(name='Monitor', target = self.inverterMonitor.start)
         self.inverterMonitorThread.start()
 
-        self.inverterEnergyDataThread = Thread(target = self.inverterEnergyData.start)
+        self.inverterEnergyDataThread = Thread(name='EnergyData', target = self.inverterEnergyData.start)
         self.inverterEnergyDataThread.start()
         
-        self.inverterRemotePanelThread = Thread(target = self.inverterRemotePanel.start)
+        self.inverterRemotePanelThread = Thread(name='RemotePanel', target = self.inverterRemotePanel.start)
         self.inverterRemotePanelThread.start()
 
-        self.inverterEmailNotificationThread = Thread(target = self.inverterEmailNotification.start)
+        self.inverterEmailNotificationThread = Thread(name='EmailNotification', target = self.inverterEmailNotification.start)
         self.inverterEmailNotificationThread.start()
 
-        self.smartbmsThread = Thread(target = self.smartbms.start)
+        self.smartbmsThread = Thread(name='SmartBMS', target = self.smartbms.start)
         self.smartbmsThread.start()
 
         for thread in threading.enumerate(): 
