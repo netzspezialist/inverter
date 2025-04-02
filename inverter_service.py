@@ -20,9 +20,6 @@ from smartbms import SmartBatteryManagementSystem
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
-logger = logging.getLogger("schedule")
-logger.setLevel(logging.DEBUG)
-
 script_path = abspath(dirname(__file__))
 
 logPath = f'{script_path}/log'

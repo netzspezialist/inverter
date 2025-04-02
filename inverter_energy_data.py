@@ -1,3 +1,4 @@
+import logging
 import sqlite3
 import asyncio
 import datetime
@@ -156,6 +157,7 @@ class InverterEnergyData:
         self.__initializeShema()
         self.__writingEnergyData()
 
+        schedule.logger.setLevel(logging.DEBUG)
         schedule.every().hour.at(":02").do(self.__writingEnergyData)
 
         self.__loop()
