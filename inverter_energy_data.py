@@ -75,7 +75,7 @@ class InverterEnergyData:
 
                         self.logger.debug(f'Updating energy [{energyFlow}] for day [{timestamp}]')
 
-                        if rowExists is False or month == current_month or (day == 2 and month == current_month - 1):
+                        if rowExists is False or month == current_month or month == current_month -1:
                             response = self.inverterCommands.energy(f'{energyFlowCommands[energyFlow]}m', str(year * 100 + month))
                             energy = response["energy"]
 
