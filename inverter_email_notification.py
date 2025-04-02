@@ -72,15 +72,8 @@ class EmailNotification:
 
 
     def __loop(self):          
-        initalRun = False
-        
         while self.serviceRunning:
-            schedule.run_pending()
-            time.sleep(120)  # Sleep for 2 minutes
-
-            if initalRun is False:
-                # self.__send_email_notification()
-                initalRun = True
+            time.sleep(1)
 
     def start(self):
         self.logger.info('Starting email notification service ...')
@@ -88,6 +81,8 @@ class EmailNotification:
         if not config["enabled"]:
             self.logger.info('Email notification service is disabled')
             return
+        
+        self.__send_email_notification()
 
         self.serviceRunning = True
         schedule.every().day.at("03:10:00").do(self.__send_email_notification)
