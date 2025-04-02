@@ -5,6 +5,7 @@ import signal
 import sys
 from threading import Thread
 from os.path import dirname, abspath
+import threading
 from inverter_connection import InverterConnection
 from inverter_email_notification import EmailNotification
 from inverter_energy_statistics import InverterEnergyStatistics
@@ -79,7 +80,7 @@ class InverterService:
         self.inverterEmailNotification = EmailNotification(self.inverterEmailNotificationLogger, self.energyStatistics)
 
         self.smartbmsLogger = logging.getLogger('smartbms')
-        self.smartbmsLogger.setLevel(logging.DEBUG)
+        self.smartbmsLogger.setLevel(logging.INFO)
         self.smartbmsLogger.addHandler(fileHandler)
         self.smartbms = SmartBatteryManagementSystem(self.smartbmsLogger, self.inverterCommands)      
 
@@ -103,6 +104,9 @@ class InverterService:
 
         self.smartbmsThread = Thread(target = self.smartbms.start)
         self.smartbmsThread.start()
+
+        for thread in threading.enumerate(): 
+            print(thread.name)
         
         self.logger.info('Starting inverter web API ...')    
         self.inverterWebAPIThread.start()

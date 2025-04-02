@@ -60,7 +60,7 @@ class InverterRemotePanel:
         self.inverterMqtt.connect()
 
         self.serviceRunning = True
-        schedule.every().hour.at(":01").do(self.__updateEnergyOutput)
+        schedule.every().hour.at(":05").do(self.__updateEnergyOutput)
 
         self.__loop()
 
