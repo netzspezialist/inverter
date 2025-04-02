@@ -106,7 +106,7 @@ class InverterService:
         self.smartbmsThread.start()
 
         for thread in threading.enumerate(): 
-            print(thread.name)
+            self.logger.info(f'Thread: {[thread.name]}')
         
         self.logger.info('Starting inverter web API ...')    
         self.inverterWebAPIThread.start()

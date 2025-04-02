@@ -4,7 +4,7 @@ import json
 from inverter_commands import InverterCommands
 from inverter_influx import InverterInflux
 from inverter_mqtt import InverterMqtt
-from logging import logging
+from logging import Logger
 
 class InverterMonitor:
     def __init__(self, logger: Logger, inverterCommands: InverterCommands):
@@ -55,7 +55,7 @@ class InverterMonitor:
                 data["timestamp"] = data["timestamp"].isoformat()[:-3]
                 jsonData = json.dumps(data, default=self.__serialize_datetime)
                 
-                self.logger.deb(f'Publishing to MQTT: {jsonData}')
+                self.logger.debug(f'Publishing to MQTT: {jsonData}')
                 self.mqtt.publish_message("qpigs", jsonData)
                 
                 await asyncio.sleep(2)
