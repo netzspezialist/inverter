@@ -138,6 +138,11 @@ class InverterEnergyData:
 
     def __loop(self):          
         while self.serviceRunning:
+
+            runnable_jobs = (job for job in schedule.jobs if schedule.job.should_run)
+            for job in sorted(runnable_jobs):
+                self.logger.info(f'Runable {job}')
+
             schedule.run_pending()
             time.sleep(1)
 
@@ -159,6 +164,10 @@ class InverterEnergyData:
 
         schedule.logger.setLevel(logging.DEBUG)
         schedule.every().hour.at(":02").do(self.__writingEnergyData)
+
+        for job in sorted(schedule.jobs):
+            self.logger.info(job)
+
 
         self.__loop()
 
