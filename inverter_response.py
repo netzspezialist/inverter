@@ -3,7 +3,8 @@ class InverterResponseConverter(object):
     def qpigs(command, timestamp, response1, response2):
 
         # qpigs  (000.0 00.0 230.1 50.0 0575 0497 007 382 52.30 000 041 0045 00.5 090.5 00.00 00008 00010110 00 00 00051 010
-        # qpigs2 (00.9 090.0 00084
+        #Device: (BBB.B CC.C DDD.D EE.E FFFF GGGG HHH III JJ.JJ KKK OOO TTTT EE.E UUU.U WW.WW PPPPP 76543210 QQ VV MMMMM 198
+        # qpigs2 (00.9 090.0 00084                                                                                       0
 
         batteryVoltage = float(response1[41:46])
 
@@ -34,10 +35,8 @@ class InverterResponseConverter(object):
         inputVoltage = round((inputVoltage1 + inputVoltage2) / 2, 2)
         inputPower = float(inputPower1 + inputPower2) + 0.001
 
-
-
+        generating = bool(response1[86:87] == '1')
         
-
         data =  {
             "command": command,
             "timestamp": timestamp,#timestamp.strftime('%Y-%m-%dT%H:%M:%S.%fZ'), # "2021-09-29T19:00:00.000",
@@ -50,7 +49,8 @@ class InverterResponseConverter(object):
             "inputCurrent": inputCurrent,
             "inputVoltage": inputVoltage,
             "inputPower": inputPower,
-            "temperature": temperature
+            "temperature": temperature,
+            "generating": generating
         }
 
         return data
