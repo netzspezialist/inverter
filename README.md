@@ -14,6 +14,14 @@ at home: mkdir energy
 cd energy
 sudo apt install python3-pip
 sudo apt install mosquitto
+
+sudo nano /etc/mosquitto/mosquitto.conf
+
+add to bottom: --------------------------
+listener 1883 0.0.0.0
+allow_anonymous true
+-----------------------------------------
+
 sudo apt install sqlite3
 git clone https://github.com/netzspezialist/inverter.git
 cd inverter
