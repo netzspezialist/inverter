@@ -58,18 +58,19 @@ class InverterEnergyData:
                         
                         if rowExists is False or day == current_day or day == current_day - 1:
                             response = self.inverterCommands.energy(f'{energyFlowCommands[energyFlow]}d', str(timestamp))
-                            energy = response["energy"]                        
-                            
+                            energy = response["energy"]
+
                             if rowExists is False:
                                 self.__insertRow(energyFlow, timestamp, energy)
                             else:
-                                self.__updateRow(energyFlow, timestamp, energy)
-                        
+                                if energy > 0:
+                                    self.__updateRow(energyFlow, timestamp, energy)
+
                         day = day - 1
 
                     elif month > 0:
                         initDaysCompleted = True
-                                            
+
                         rowExists = self._rowExists(energyFlow, timestamp)
                         energy = 0
 
@@ -79,10 +80,11 @@ class InverterEnergyData:
                             response = self.inverterCommands.energy(f'{energyFlowCommands[energyFlow]}m', str(year * 100 + month))
                             energy = response["energy"]
 
-                            if rowExists is False:
+                            if rowExists is False and energy > 0:
                                 self.__insertRow(energyFlow, timestamp, energy)
                             else:
-                                self.__updateRow(energyFlow, timestamp, energy)
+                                if energy > 0:
+                                    self.__updateRow(energyFlow, timestamp, energy)
 
                         month = month - 1
                     
