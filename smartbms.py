@@ -68,6 +68,11 @@ class SmartBatteryManagementSystem:
 
         timestamp = datetime.datetime.now()
 
+        soc_raw = data.get('SOC')
+
+        if soc_raw is None:
+                return
+
         soc = float(data['SOC'])
         voltage = float(data['PMV'])
         current = float(data['PMA'])

@@ -11,7 +11,6 @@ from inverter_email_notification import EmailNotification
 from inverter_energy_statistics import InverterEnergyStatistics
 from inverter_monitor import InverterMonitor
 from inverter_commands import InverterCommands
-from inverter_mqtt import InverterMqtt
 from inverter_remotepanel import InverterRemotePanel
 from inverter_webapi import InverterWebAPI
 from inverter_energy_data import InverterEnergyData
@@ -128,9 +127,6 @@ class InverterService:
         self.inverterRemotePanel.stop()
         self.inverterEmailNotification.stop()
         self.energyStatistics.close()
-
-        #self.inverterMqtt.disconnect()
-
 
 if __name__ == '__main__':
 
