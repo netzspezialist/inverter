@@ -27,7 +27,7 @@ git clone https://github.com/netzspezialist/inverter.git
 cd inverter
 python3 -m venv venv
 source venv/bin/activate
-pip3 install serial
+pip3 install pyserial
 pip3 install influxdb-client
 pip3 install paho-mqtt
 pip3 install flask

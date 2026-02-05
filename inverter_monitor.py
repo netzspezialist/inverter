@@ -58,7 +58,7 @@ class InverterMonitor:
                 self.logger.debug(f'Publishing to MQTT: {jsonData}')
                 self.mqtt.publish_message("qpigs", jsonData)
                 
-                await asyncio.sleep(2)
+                await asyncio.sleep(5)
             except Exception as e:
                 self.logger.error(f'Inverter monitor loop failed: {e}')
                 await asyncio.sleep(10)
