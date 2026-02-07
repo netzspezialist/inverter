@@ -1,5 +1,7 @@
 # User-specific files
 inverter_config.py
+*.db
+log/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

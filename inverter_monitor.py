@@ -61,7 +61,7 @@ class InverterMonitor:
                 await asyncio.sleep(2)
             except Exception as e:
                 self.logger.error(f'Inverter monitor loop failed: {e}')
-                await asyncio.sleep(10)
+                await asyncio.sleep(60)
 
         self.mqtt.disconnect()
         self.logger.info('Inverter monitor loop stopped')
