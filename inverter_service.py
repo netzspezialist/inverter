@@ -84,7 +84,7 @@ class InverterService:
         self.smartbmsLogger.addHandler(fileHandler)
         self.smartbms = SmartBatteryManagementSystem(self.smartbmsLogger, self.inverterCommands)      
 
-        self.inverterWebAPI = InverterWebAPI(logger, self.inverterCommands)
+        self.inverterWebAPI = InverterWebAPI(logger, self.inverterCommands, self.inverterMonitor, self.inverterRemotePanel)
         self.inverterWebAPIThread = Thread(target = self.inverterWebAPI.start)        
 
     def start(self):

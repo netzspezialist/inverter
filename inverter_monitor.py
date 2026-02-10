@@ -1,6 +1,7 @@
 import asyncio
 from datetime import datetime
 import json
+from threading import Lock
 from inverter_commands import InverterCommands
 from inverter_influx import InverterInflux
 from inverter_mqtt import InverterMqtt
@@ -13,6 +14,8 @@ class InverterMonitor:
         self.inverterCommands = inverterCommands
         self.mqtt = InverterMqtt(logger)
         self.last_execution_date = None  # Initialize last execution date    
+        self._last_qpigs = None
+        self._last_qpigs_lock = Lock()
 
     async def __loop(self):
         self.logger.info('Inverter monitor loop started ')
@@ -53,6 +56,7 @@ class InverterMonitor:
                 self.logger.debug(f'Inverter data: {data}')
                 
                 data["timestamp"] = data["timestamp"].isoformat()[:-3]
+                self.__set_last_qpigs(data)
                 jsonData = json.dumps(data, default=self.__serialize_datetime)
                 
                 self.logger.debug(f'Publishing to MQTT: {jsonData}')
@@ -61,7 +65,7 @@ class InverterMonitor:
                 await asyncio.sleep(2)
             except Exception as e:
                 self.logger.error(f'Inverter monitor loop failed: {e}')
-                await asyncio.sleep(60)
+                await asyncio.sleep(10)
 
         self.mqtt.disconnect()
         self.logger.info('Inverter monitor loop stopped')
@@ -70,6 +74,16 @@ class InverterMonitor:
         if isinstance(obj, datetime.datetime): 
             return obj.isoformat() 
         raise TypeError("Type not serializable") 
+
+    def __set_last_qpigs(self, data):
+        with self._last_qpigs_lock:
+            self._last_qpigs = dict(data)
+
+    def get_last_qpigs(self):
+        with self._last_qpigs_lock:
+            if self._last_qpigs is None:
+                return None
+            return dict(self._last_qpigs)
   
     def start(self):
         self.logger.info('Starting inverter monitoring ...')        

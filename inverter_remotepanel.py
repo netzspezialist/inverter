@@ -3,6 +3,7 @@ import json
 from os.path import abspath, dirname
 import sqlite3
 import time
+from threading import Lock
 from inverter_energy_statistics import InverterEnergyStatistics
 import schedule
 from inverter_mqtt import InverterMqtt
@@ -12,6 +13,8 @@ class InverterRemotePanel:
         self.logger = logger
         self.inverterMqtt : InverterMqtt = InverterMqtt(logger)
         self.inverterEnergyStatistics = inverterEnergyStatistics
+        self._last_energy_output = None
+        self._last_energy_output_lock = Lock()
     
     def __updateEnergyOutput(self):
         try:
@@ -35,6 +38,8 @@ class InverterRemotePanel:
 
             self.logger.info(f'Publishing energyOutput: {jsonData}')
 
+            self.__set_last_energy_output(data)
+
             self.inverterMqtt.publish_message('energyOutput', jsonData)
         except Exception as e:
             self.logger.error(f'Error in inverter remote panel loop: {e}')
@@ -43,6 +48,16 @@ class InverterRemotePanel:
         if isinstance(obj, datetime.datetime): 
             return obj.isoformat() 
         raise TypeError("Type not serializable") 
+
+    def __set_last_energy_output(self, data):
+        with self._last_energy_output_lock:
+            self._last_energy_output = dict(data)
+
+    def get_last_energy_output(self):
+        with self._last_energy_output_lock:
+            if self._last_energy_output is None:
+                return None
+            return dict(self._last_energy_output)
 
     def __loop(self):          
         initalRun = False
