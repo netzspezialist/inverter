@@ -3,6 +3,7 @@ import datetime
 import json
 import random
 import time
+import traceback
 import paho.mqtt.client as mqtt
 
 from inverter_commands import InverterCommands
@@ -61,61 +62,65 @@ class SmartBatteryManagementSystem:
         self.client.loop_start()
 
     def on_message(self, client, userdata, message):
-        payload = message.payload.decode()
-        self.logger.debug(f'Message received: {payload}')
+        try:
+            payload = message.payload.decode()
+            self.logger.debug(f'Message received: {payload}')
         
-        data = json.loads(payload)
+            data = json.loads(payload)
 
-        timestamp = datetime.datetime.now()
+            timestamp = datetime.datetime.now()
 
-        soc = float(data['SOC'])
-        voltage = float(data['PMV'])
-        current = float(data['PMA'])
-        temperature = data['TMP']
-        voltages = [data['bat'][str(i)] / 1000.0 for i in range(16)]
+            soc = float(data['Pack']['SOC'])
+            voltage = float(data['Pack']['Voltage'])
+            current = float(data['Pack']['Current'])
+            temperature = data['Pack']['BMS_Temp']
+            voltages = [data['CellV'][f'CellV_{i}'] for i in range(1, 17)]
 
-        highestCellVoltage = max(voltages)
-        lowestCellVoltage = min(voltages)
+            highestCellVoltage = max(voltages)
+            lowestCellVoltage = min(voltages)
 
-        self.logger.debug(f'Voltage: {voltage}V, SOC: {soc}%, Current: {current}A, Temperature: {temperature}°C, Cell voltages: {voltages}')
+            self.logger.debug(f'Voltage: {voltage}V, SOC: {soc}%, Current: {current}A, Temperature: {temperature}°C, Cell voltages: {voltages}')
 
-        if not self.influxUploadEnabled:
-            return
-        
-        if self.influxLastUploadTime and (timestamp - self.influxLastUploadTime).total_seconds() < self.influxUploadMinimumDelaySeconds:
-            self.logger.debug('Minimum delay not reached, skipping upload.')
-            return
+            if not self.influxUploadEnabled:
+                return
+            
+            if self.influxLastUploadTime and (timestamp - self.influxLastUploadTime).total_seconds() < self.influxUploadMinimumDelaySeconds:
+                self.logger.debug('Minimum delay not reached, skipping upload.')
+                return
 
-        point = (
-            Point("bms")
-            .field("voltage", voltage)
-            .field("soc", soc)
-            .field("current", current)
-            .field("temperature", temperature)
-            .field("cellVoltage01", voltages[0])
-            .field("cellVoltage02", voltages[1])
-            .field("cellVoltage03", voltages[2])
-            .field("cellVoltage04", voltages[3])
-            .field("cellVoltage05", voltages[4])
-            .field("cellVoltage06", voltages[5])
-            .field("cellVoltage07", voltages[6])
-            .field("cellVoltage08", voltages[7])
-            .field("cellVoltage09", voltages[8])
-            .field("cellVoltage10", voltages[9])
-            .field("cellVoltage11", voltages[10])
-            .field("cellVoltage12", voltages[11])
-            .field("cellVoltage13", voltages[12])
-            .field("cellVoltage14", voltages[13])
-            .field("cellVoltage15", voltages[14])
-            .field("cellVoltage16", voltages[15])
-            .field("highestCellVoltage", highestCellVoltage)
-            .field("lowestCellVoltage", lowestCellVoltage)            
-            .time(int(timestamp.timestamp()), WritePrecision.S)
-        )
-        
-        self.write_api.write(bucket=self.bucket, org=self.org, record=point)
-        self.influxLastUploadTime = timestamp
+            point = (
+                Point("bms")
+                .field("voltage", voltage)
+                .field("soc", soc)
+                .field("current", current)
+                .field("temperature", temperature)
+                .field("cellVoltage01", voltages[0])
+                .field("cellVoltage02", voltages[1])
+                .field("cellVoltage03", voltages[2])
+                .field("cellVoltage04", voltages[3])
+                .field("cellVoltage05", voltages[4])
+                .field("cellVoltage06", voltages[5])
+                .field("cellVoltage07", voltages[6])
+                .field("cellVoltage08", voltages[7])
+                .field("cellVoltage09", voltages[8])
+                .field("cellVoltage10", voltages[9])
+                .field("cellVoltage11", voltages[10])
+                .field("cellVoltage12", voltages[11])
+                .field("cellVoltage13", voltages[12])
+                .field("cellVoltage14", voltages[13])
+                .field("cellVoltage15", voltages[14])
+                .field("cellVoltage16", voltages[15])
+                .field("highestCellVoltage", highestCellVoltage)
+                .field("lowestCellVoltage", lowestCellVoltage)            
+                .time(int(timestamp.timestamp()), WritePrecision.S)
+            )
+            
+            self.write_api.write(bucket=self.bucket, org=self.org, record=point)
+            self.influxLastUploadTime = timestamp
 
+        except Exception as e:
+            self.logger.error(f"Error processing message: {e}")
+            self.logger.error(traceback.format_exc())
 
     def setVoltage(self, targetVoltage):
         self.logger.debug(f'Setting voltage to {targetVoltage}')
