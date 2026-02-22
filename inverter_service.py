@@ -79,7 +79,7 @@ class InverterService:
         self.inverterEmailNotification = EmailNotification(self.inverterEmailNotificationLogger, self.energyStatistics)
 
         self.smartbmsLogger = logging.getLogger('smartbms')
-        self.smartbmsLogger.setLevel(logging.INFO)
+        self.smartbmsLogger.setLevel(logging.DEBUG)
         self.smartbmsLogger.addHandler(fileHandler)
         self.smartbms = SmartBatteryManagementSystem(self.smartbmsLogger, self.inverterCommands)      
 

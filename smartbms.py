@@ -47,7 +47,7 @@ class SmartBatteryManagementSystem:
             if rc == 0:
                 self.logger.info("Connected to MQTT Broker!")
                 self.logger.debug(f'Data: client {client} userdata {userdata} flags {flags} rc {rc} properties {properties}')
-                self.logger.debug(f'Subscribing to topic {self.topic}') 
+                self.logger.info(f'Subscribing to topic {self.topic}') 
                 self.client.subscribe(self.topic)
             else:
                 self.logger.error(f"Failed to connect, return code [{rc}]")
