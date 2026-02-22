@@ -29,7 +29,6 @@ class SmartBatteryManagementSystem:
         self.influxUploadMinimumDelaySeconds = smartbmsConfig["influxUploadMinimumDelaySeconds"]
         self.influxLastUploadTime = None  # Initialize the last upload time
 
-        self.enabled = influxConfig["enabled"]
         token = influxConfig["token"]
         org = influxConfig["org"]
         bucket = influxConfig["bucket"]
@@ -63,6 +62,7 @@ class SmartBatteryManagementSystem:
 
     def on_message(self, client, userdata, message):
         try:
+            self.logger.info("on_message called!")
             payload = message.payload.decode()
             self.logger.debug(f'Message received: {payload}')
         
